@@ -1,17 +1,12 @@
-package server.models;
+package server;
 
-import server.EventHandler;
-import server.Server;
-import server.ServerLauncher;
+import server.models.Course;
+import server.models.RegistrationForm;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.ObjectOutputStream;
-import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Scanner;
 
 public class Client {
     private RegistrationForm inscription;
@@ -44,7 +39,6 @@ public class Client {
 
         // reads till the end of the stream
         while ((i = inputStream.read()) != -1) {
-
             // converts integer to character
             c = (char) i;
 
@@ -63,5 +57,6 @@ public class Client {
         // prendre les parametres dans inscription.txt de creer l'object and then faire le thingy
 
         return null;
-    }
+        }
 }
+
