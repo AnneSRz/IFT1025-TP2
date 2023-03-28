@@ -111,10 +111,11 @@ public class Server {
      La méthode gère les exceptions si une erreur se produit lors de la lecture du fichier ou de l'écriture de l'objet dans le flux.
      @param arg la session pour laquelle on veut récupérer la liste des cours
      */
-    private ArrayList<Course> listeDeCours = new ArrayList<Course>();
+    private ArrayList<Course> listeDeCours = new ArrayList<>();
+
     public void handleLoadCourses(String arg) {
         try{
-            //Step 1 : read cours.txt file ro get the information
+            //Step 1 : read cours.txt file to get the information
             File fichierTexte = new File("/src/main/Java/server/data/cours.txt");
             Scanner cours = new Scanner(fichierTexte);
             cours.useDelimiter("\t");
@@ -125,7 +126,7 @@ public class Server {
                 String trimestre = cours.next();
 
                 Course coursDisponibles = new Course(nomCours, sigle, trimestre);
-                listeDeCours.add(coursDisponibles);
+                this.listeDeCours.add(coursDisponibles);
                 System.out.println(listeDeCours);
             }
 
@@ -138,17 +139,17 @@ public class Server {
             }
             System.out.println(coursFiltres);
 
-            //Step 3 : Retourner la liste d'onjet Courses au client via le socket en utilisant ObjectOutputStream
+            //Step 3 : Retourner la liste d'objet Courses au client via le socket en utilisant ObjectOutputStream
             //pt pas necessaire puisqu'en executant serverauncher ça istancier server et l'executer sur le port 1337:
             // ServerSocket ss = new ServerSocket(1337);
             // Socket client = ss.accept();
             ObjectOutputStream output = new ObjectOutputStream(client.getOutputStream());
             output.writeObject(coursFiltres);
 
-            client.close();
-            output.close();
+            //client.close();
+            //output.close();
 
-        }catch (IOException ex){
+        }catch (IOException ex) {
             ex.printStackTrace();
             System.out.println("Erreur lors de la lecture du fichier");
         }
@@ -189,7 +190,6 @@ public class Server {
             ex.printStackTrace();
             System.out.println("Erreur lors de l'inscription");
         }
-
     }
 }
 
