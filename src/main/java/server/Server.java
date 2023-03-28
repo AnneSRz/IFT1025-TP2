@@ -146,8 +146,8 @@ public class Server {
             ObjectOutputStream output = new ObjectOutputStream(client.getOutputStream());
             output.writeObject(coursFiltres);
 
-            //client.close();
-            //output.close();
+            client.close();
+            output.close();
 
         }catch (IOException ex) {
             ex.printStackTrace();
