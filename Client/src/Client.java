@@ -1,30 +1,10 @@
-package server;
-
-import server.models.Course;
-import server.models.RegistrationForm;
-
-import java.io.*;
-import java.net.Socket;
-import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Client {
-    private RegistrationForm inscription;
-    private int port;
-    private Server server;
-    private Server client;
-    private ObjectInputStream objectInputStream;
-    private ObjectOutputStream objectOutputStream;
-
-    public Client(Server server) {
-        // ArrayList<Course> coursListe = new ArrayList<>();
-        this.server = server;
-    }
-
-    // fonction private course changer marche pas????
-    // private static void charger(String[] args) { ???
-    private Course charger() {  // Fonctionnalite charger???? Une fonction charger?? AAAAAAAHHHHHHH
-        //Step 1 : Se connecter au serveur genre Server.java...??
+    public static void main(String[] args) {
+        // private static void charger(String[] args) { ???
+        // Fonctionnalite charger???? Une fonction charger?? AAAAAAAHHHHHHH
+        //Step 1 : Connecter le client au serveur genre ??
 
         // Step 2 : Client récupère la liste des cours disponibles pour une session donnée
         int sessionChoisie = 0;
@@ -41,7 +21,6 @@ public class Client {
 
             System.out.print("> Choix : ");
             Scanner scan = new Scanner(System.in);
-
             if (scan.hasNextInt()) {
                 sessionChoisie = scan.nextInt();
                 if (sessionChoisie < 1 || sessionChoisie > 3) {
@@ -74,17 +53,18 @@ public class Client {
 
         System.out.println("les cours offerts pour la session d' " + session + " sont: ");
         // Step 3 : Envoie une requete charger au serveur (handleLoadCourses)
-        ArrayList<Course> coursSession = new ArrayList<>();
-        this.server.handleLoadCourses(session);
+
         //ask the server to do handlerLoadCourses(session) via the socket
         //todo get array from socket
 
         //Step 4 :  Le serveur doit récupérer la liste des cours du fichier cours.txt et l’envoie au client.
 
         // Step 5 : Le client récupère les cours et les affiche.
-        return null;
+
     }
 }
+
+// So askip le tpistes a dit qu'il faut 2 fonctions comme server a handle load course et registration
 /*
     private  RegistrationForm inscription() throws IOException {
 
@@ -165,5 +145,3 @@ public class Client {
     }
 }
 */
-
-
