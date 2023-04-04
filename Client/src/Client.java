@@ -53,6 +53,7 @@ public class Client {
 
         System.out.println("les cours offerts pour la session d' " + session + " sont: ");
         // Step 3 : Envoie une requete charger au serveur (handleLoadCourses)
+        //Afficher les cours de la session
 
         //ask the server to do handlerLoadCourses(session) via the socket
         //todo get array from socket
