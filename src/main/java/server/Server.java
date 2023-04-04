@@ -38,8 +38,8 @@ public class Server {
      * ce port est donné et la limite d'attente de connexion est de 1, ça définit un eventHandler pour gérer les
      * évènements sur le serveur
      *
-     * @param port
-     * @throws IOException
+     * @param port le numero du port pour les connexions au serveur
+     * @throws IOException Pour les erreurs qui sont produites lors le serverSocket est cree.
      */
     public Server(int port) throws IOException {
         this.server = new ServerSocket(port, 1);
@@ -47,10 +47,18 @@ public class Server {
         this.addEventHandler(this::handleEvents);
     }
 
+    /**
+     * Ajoute un EventHandler pour s'occuper des connexions
+     * @param h l'evenemnt EventHandler qui est ajouter pour s'coccuper des connexions
+     */
     public void addEventHandler(EventHandler h) {
         this.handlers.add(h);
     }
 
+    /**
+     * @param cmd
+     * @param arg
+     */
     private void alertHandlers(String cmd, String arg) {
         for (EventHandler h : this.handlers) {
             h.handle(cmd, arg);
