@@ -115,6 +115,10 @@ public class Server {
 
     public void handleLoadCourses(String arg) {
         try{
+            // ???? pt pas necessaire non plus puisqu'en executant serverlauncher ça istancier server et l'executer sur le port 1337:
+            ServerSocket ss = new ServerSocket(1337);
+            Socket socket = ss.accept();
+
             //Step 1 : read cours.txt file to get the information
             File fichierTexte = new File("/src/main/Java/server/data/cours.txt");
             Scanner cours = new Scanner(fichierTexte);
@@ -163,13 +167,10 @@ public class Server {
     public void handleRegistration() {
         try {
             //Step 1 : Lire object registrationForm from Socket
-            //pt pas necessaire non plus puisqu'en executant serverauncher ça istancier server et l'executer sur le port 1337:
-            //ServerSocket ss = new ServerSocket(1337);
-            //Socket socket = ss.accept();
 
             ObjectInputStream input = new ObjectInputStream(client.getInputStream());
             RegistrationForm inscription = (RegistrationForm)input.readObject();
-            System.out.println(inscription);
+            System.out.println(inscription); // A enlever
 
             //Step 2 : Save the object in Inscription.txt file (attention au format)
             FileWriter fw = new FileWriter("inscription.txt");
