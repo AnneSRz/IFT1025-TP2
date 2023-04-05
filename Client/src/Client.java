@@ -1,67 +1,85 @@
+import java.io.BufferedWriter;
+import java.io.BufferedReader;
+import java.io.OutputStream;
+import java.io.InputStream;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.util.Scanner;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.InputStreamReader;
 
 public class Client {
     public static void main(String[] args) {
-        // private static void charger(String[] args) { ???
-        // Fonctionnalite charger???? Une fonction charger?? AAAAAAAHHHHHHH
-        //Step 1 : Connecter le client au serveur genre ??
+        try {
+            //Step 1 : Connecter le client au serveur
+            ServerSocket serverSocket = new ServerSocket(1337);
+            Socket socket = serverSocket.accept();
 
-        // Step 2 : Client récupère la liste des cours disponibles pour une session donnée
-        int sessionChoisie = 0;
-        String session = "";
-        String[] sessionsListes = {"Automne", "Hiver", "Ete"};
+            // Step 2 : Le serveur doit récupérer la liste des cours du fichier cours.txt et l’envoie au client
 
-        System.out.println("*** Bienvenue au portail de cours de l'UDEM ***");
-        System.out.println("Veuillez choisir la session pour laquelle vous voulez consultez la liste des cours:");
+            // Step 3 : Client récupère la liste des cours disponibles pour une session donnée
+            int sessionChoisie = 0;
+            String session = "";
+            String[] sessionsListes = {"Automne", "Hiver", "Ete"};
 
-        while (sessionChoisie < 1 || sessionChoisie > 3) {
-            System.out.println("1. " + sessionsListes[0]);
-            System.out.println("2. " + sessionsListes[1]);
-            System.out.println("3. " + sessionsListes[2]);
+            System.out.println("*** Bienvenue au portail de cours de l'UDEM ***");
+            System.out.println("Veuillez choisir la session pour laquelle vous voulez consultez la liste des cours:");
 
-            System.out.print("> Choix : ");
-            Scanner scan = new Scanner(System.in);
-            if (scan.hasNextInt()) {
-                sessionChoisie = scan.nextInt();
-                if (sessionChoisie < 1 || sessionChoisie > 3) {
+            while (sessionChoisie < 1 || sessionChoisie > 3) {
+                System.out.println("1. " + sessionsListes[0]);
+                System.out.println("2. " + sessionsListes[1]);
+                System.out.println("3. " + sessionsListes[2]);
+
+                System.out.print("> Choix : ");
+                Scanner scan = new Scanner(System.in);
+                if (scan.hasNextInt()) {
+                    sessionChoisie = scan.nextInt();
+                    if (sessionChoisie < 1 || sessionChoisie > 3) {
+                        System.out.println("Choix de cours invalide");
+                        System.out.println("Faites un autre choix");
+                    }
+                } else {
                     System.out.println("Choix de cours invalide");
-                    System.out.println("Faites un autre choix");
+                    System.out.println("Faites un autre choix entre 1 et 3");
+                    scan.next();
                 }
-            } else {
-                System.out.println("Choix de cours invalide");
-                System.out.println("Faites un autre choix entre 1 et 3");
-                //scan.next();
             }
+
+            switch (sessionChoisie) {
+                case 1:
+                    session = sessionsListes[0];
+                    break;
+                case 2:
+                    session = sessionsListes[1];
+                    break;
+
+                case 3:
+                    session = sessionsListes[2];
+                    break;
+
+                default:
+                    break;
+
+            }
+
+            System.out.println("les cours offerts pour la session d'" + session + " sont: ");
+            // Step 4 : Envoie une requete charger au serveur "Chaerger"
+            OutputStream os = socket.getOutputStream();
+            InputStream is = socket.getInputStream();
+            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(os));
+
+            bw.write("Charger");
+
+            // Step 5 : Le client affiche ce qui est affiché par le serveur aka la liste des cours triés
+            BufferedReader br = new BufferedReader(new InputStreamReader(is));
+            String cours = br.readLine();
+            System.out.println(cours);
+
+        }catch (IOException ex) {
+            ex.printStackTrace();
+            System.out.println("Erreur lors du Chargement");
         }
-
-        switch (sessionChoisie) {
-            case 1:
-                session = sessionsListes[0];
-                break;
-            case 2:
-                session = sessionsListes[1];
-                break;
-
-            case 3:
-                session = sessionsListes[2];
-                break;
-
-            default:
-                break;
-
-        }
-
-        System.out.println("les cours offerts pour la session d' " + session + " sont: ");
-        // Step 3 : Envoie une requete charger au serveur (handleLoadCourses)
-        //Afficher les cours de la session
-
-        //ask the server to do handlerLoadCourses(session) via the socket
-        //todo get array from socket
-
-        //Step 4 :  Le serveur doit récupérer la liste des cours du fichier cours.txt et l’envoie au client.
-
-        // Step 5 : Le client récupère les cours et les affiche.
-
     }
 }
 

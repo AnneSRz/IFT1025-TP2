@@ -125,8 +125,8 @@ public class Server {
     public void handleLoadCourses(String arg) {
         try{
             // ???? pt pas necessaire non plus puisqu'en executant serverlauncher ça istancier server et l'executer sur le port 1337:
-            ServerSocket ss = new ServerSocket(1337);
-            Socket socket = ss.accept();
+            //ServerSocket ss = new ServerSocket(1337);
+            //Socket socket = ss.accept();
 
             //Step 1 : read cours.txt file to get the information
             File fichierTexte = new File("/src/main/Java/server/data/cours.txt");
@@ -153,9 +153,6 @@ public class Server {
             System.out.println(coursFiltres);
 
             //Step 3 : Retourner la liste d'objet Courses au client via le socket en utilisant ObjectOutputStream
-            //pt pas necessaire puisqu'en executant serverauncher ça istancier server et l'executer sur le port 1337:
-            // ServerSocket ss = new ServerSocket(1337);
-            // Socket client = ss.accept();
             ObjectOutputStream output = new ObjectOutputStream(client.getOutputStream());
             output.writeObject(coursFiltres);
 
