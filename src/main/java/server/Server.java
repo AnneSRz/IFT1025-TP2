@@ -66,12 +66,16 @@ public class Server {
         }
     }
 
+    /**
+     *
+     */
     public void run() {
         while (true) {
             try {
                 client = server.accept();
                 System.out.println("Connecté au client: " + client);
                 objectInputStream = new ObjectInputStream(client.getInputStream());
+                System.out.println(client.getInputStream());
                 objectOutputStream = new ObjectOutputStream(client.getOutputStream());
                 listen();
                 disconnect();
@@ -125,8 +129,8 @@ public class Server {
     public void handleLoadCourses(String arg) {
         try{
             // ???? pt pas necessaire non plus puisqu'en executant serverlauncher ça istancier server et l'executer sur le port 1337:
-            //ServerSocket ss = new ServerSocket(1337);
-            //Socket socket = ss.accept();
+            ServerSocket ss = new ServerSocket(1337);
+            Socket client = ss.accept(); // attendre la connexion du client
 
             //Step 1 : read cours.txt file to get the information
             File fichierTexte = new File("/src/main/Java/server/data/cours.txt");
@@ -142,8 +146,9 @@ public class Server {
                 this.listeDeCours.add(coursDisponibles);
                 System.out.println(listeDeCours);
             }
+            // Step 2 : Chercher la listes des cours voulues envoyes par le client au socket
 
-            //Step 2 : Filtrer les cours selon la session donnée en arguments dans la fonction
+            //Step 3 : Filtrer les cours selon la session donnée en arguments dans la fonction
             ArrayList<Course> coursFiltres = new ArrayList<>();
             for (Course lesCours : listeDeCours){
                 if (lesCours.getSession().equals(arg)){
@@ -152,7 +157,7 @@ public class Server {
             }
             System.out.println(coursFiltres);
 
-            //Step 3 : Retourner la liste d'objet Courses au client via le socket en utilisant ObjectOutputStream
+            //Step 4 : Retourner la liste d'objet Courses au client via le socket en utilisant ObjectOutputStream
             ObjectOutputStream output = new ObjectOutputStream(client.getOutputStream());
             output.writeObject(coursFiltres);
 
@@ -166,9 +171,9 @@ public class Server {
     }
 
     /**
-     Récupérer l'objet 'RegistrationForm' envoyé par le client en utilisant 'objectInputStream', l'enregistrer dans un fichier texte
-     et renvoyer un message de confirmation au client.
-     La méthode gére les exceptions si une erreur se produit lors de la lecture de l'objet, l'écriture dans un fichier ou dans le flux de sortie.
+     * Récupérer l'objet 'RegistrationForm' envoyé par le client en utilisant 'objectInputStream', l'enregistrer dans
+     * un fichier texte et renvoyer un message de confirmation au client.
+     * La méthode gére les exceptions si une erreur se produit lors de la lecture de l'objet, l'écriture dans un fichier ou dans le flux de sortie.
      */
     public void handleRegistration() {
         try {

@@ -4,23 +4,28 @@ import java.io.OutputStream;
 import java.io.InputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Scanner;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.InputStreamReader;
 
-public class Client {
-    public static void main(String[] args) {
+public class Client_simple {
+
+    private Socket socket;
+    private int port;
+    public Client_simple(int port) throws IOException{
+        //Step 1 : Connecter le client au serveur
+        this.port = port;
+    }
+    public void charger() {
         try {
-            //Step 1 : Connecter le client au serveur
-            ServerSocket serverSocket = new ServerSocket(1337);
-            Socket socket = serverSocket.accept();
+            this.socket = new Socket("127.0.0.1",this.port);
 
             // Step 2 : Le serveur doit récupérer la liste des cours du fichier cours.txt et l’envoie au client
 
             // Step 3 : Client récupère la liste des cours disponibles pour une session donnée
             int sessionChoisie = 0;
-            String session = "";
             String[] sessionsListes = {"Automne", "Hiver", "Ete"};
 
             System.out.println("*** Bienvenue au portail de cours de l'UDEM ***");
@@ -45,7 +50,7 @@ public class Client {
                     scan.next();
                 }
             }
-
+            String session = "";
             switch (sessionChoisie) {
                 case 1:
                     session = sessionsListes[0];
@@ -64,14 +69,13 @@ public class Client {
             }
 
             System.out.println("les cours offerts pour la session d'" + session + " sont: ");
-            // Step 4 : Envoie une requete charger au serveur "Chaerger"
+            //Step 4 : Envoie une requete charger au serveur "Charger"
             OutputStream os = socket.getOutputStream();
             InputStream is = socket.getInputStream();
             BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(os));
+            bw.write("CHARGER");
 
-            bw.write("Charger");
-
-            // Step 5 : Le client affiche ce qui est affiché par le serveur aka la liste des cours triés
+            //Step 5 : Le client affiche ce qui est affiché par le serveur aka la liste des cours triés
             BufferedReader br = new BufferedReader(new InputStreamReader(is));
             String cours = br.readLine();
             System.out.println(cours);
@@ -83,7 +87,7 @@ public class Client {
     }
 }
 
-// So askip le tpistes a dit qu'il faut 2 fonctions comme server a handle load course et registration
+// So askip le tpistes a dit qu'il faut 2 fonctions comme Server a handle load course et registration
 /*
     private  RegistrationForm inscription() throws IOException {
 
