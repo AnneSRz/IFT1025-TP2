@@ -2,7 +2,6 @@ import java.io.BufferedWriter;
 import java.io.BufferedReader;
 import java.io.OutputStream;
 import java.io.InputStream;
-import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -22,9 +21,7 @@ public class Client_simple {
         try {
             this.socket = new Socket("127.0.0.1",this.port);
 
-            // Step 2 : Le serveur doit récupérer la liste des cours du fichier cours.txt et l’envoie au client
-
-            // Step 3 : Client récupère la liste des cours disponibles pour une session donnée
+            // Step 2 : Le client doit choisir la session pour laquelle il veut voir les cours
             int sessionChoisie = 0;
             String[] sessionsListes = {"Automne", "Hiver", "Ete"};
 
@@ -32,15 +29,15 @@ public class Client_simple {
             System.out.println("Veuillez choisir la session pour laquelle vous voulez consultez la liste des cours:");
 
             while (sessionChoisie < 1 || sessionChoisie > 3) {
-                System.out.println("1. " + sessionsListes[0]);
-                System.out.println("2. " + sessionsListes[1]);
-                System.out.println("3. " + sessionsListes[2]);
+                for (int i = 0 ; i < sessionsListes.length; i++)
+                    System.out.println((i+1) + "." + sessionsListes[i]);
 
                 System.out.print("> Choix : ");
+
                 Scanner scan = new Scanner(System.in);
                 if (scan.hasNextInt()) {
                     sessionChoisie = scan.nextInt();
-                    if (sessionChoisie < 1 || sessionChoisie > 3) {
+                    if (sessionChoisie < 1 || sessionChoisie > 3 ) {
                         System.out.println("Choix de cours invalide");
                         System.out.println("Faites un autre choix");
                     }
@@ -51,34 +48,39 @@ public class Client_simple {
                 }
             }
             String session = "";
-            switch (sessionChoisie) {
-                case 1:
-                    session = sessionsListes[0];
-                    break;
-                case 2:
-                    session = sessionsListes[1];
-                    break;
-
-                case 3:
-                    session = sessionsListes[2];
-                    break;
-
-                default:
-                    break;
-
+            for (String varTempSession : sessionsListes) {
+                session = varTempSession;
             }
 
-            System.out.println("les cours offerts pour la session d'" + session + " sont: ");
-            //Step 4 : Envoie une requete charger au serveur "Charger"
-            OutputStream os = socket.getOutputStream();
-            InputStream is = socket.getInputStream();
-            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(os));
-            bw.write("CHARGER");
+            //Step 3 : Envoie une requete charger au serveur "Charger"
+            OutputStreamWriter os = new OutputStreamWriter(this.socket.getOutputStream());
+            BufferedWriter writer = new BufferedWriter(os);
 
-            //Step 5 : Le client affiche ce qui est affiché par le serveur aka la liste des cours triés
-            BufferedReader br = new BufferedReader(new InputStreamReader(is));
-            String cours = br.readLine();
-            System.out.println(cours);
+            String line = "CHARGER";
+            writer.append(line).append("\n");
+
+
+            // Step 4 : Envoyer la session choisie au serveur qui sera utilisé comme arguments dans la fonction
+            // handleLoadCourses
+            writer.append(session);
+
+            // Vider le buffer
+            writer.flush();
+            // writer.close();
+
+            //Step 5 : Le client affiche ce qui est envoyé par le serveur aka la liste des cours triés
+            System.out.println("les cours offerts pour la session d'" + session + " sont: ");
+
+            InputStreamReader is = new InputStreamReader(this.socket.getInputStream());
+            BufferedReader reader = new BufferedReader(is);
+
+            // Tant que le serveur envoie des données on les affiche
+            String lin ;
+            while ((lin = reader.readLine()) != null) {
+                System.out.println("Reçu : " + lin);
+            }
+
+            //System.out.println(cours);
 
         }catch (IOException ex) {
             ex.printStackTrace();

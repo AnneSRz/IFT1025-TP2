@@ -16,6 +16,8 @@ import server.models.RegistrationForm;
 import java.util.Scanner;
 import java.io.FileWriter;
 import java.io.BufferedWriter;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 
 /**
  * Le serveur peut éxécuter des commandes spécifiques tels que REGISTER_COMMAND et LOAD_COMMAND pour permettre a
@@ -118,35 +120,37 @@ public class Server {
     }
 
     /**
-     Lire un fichier texte contenant des informations sur les cours et les transofmer en liste d'objets 'Course'.
-     La méthode filtre les cours par la session spécifiée en argument.
-     Ensuite, elle renvoie la liste des cours pour une session au client en utilisant l'objet 'objectOutputStream'.
-     La méthode gère les exceptions si une erreur se produit lors de la lecture du fichier ou de l'écriture de l'objet dans le flux.
+     * Lire un fichier texte contenant des informations sur les cours et les transofmer en liste d'objets 'Course'.
+     * La méthode filtre les cours par la session spécifiée en argument.
+     * Ensuite, elle renvoie la liste des cours pour une session au client en utilisant l'objet 'objectOutputStream'.
+     * La méthode gère les exceptions si une erreur se produit lors de la lecture du fichier ou de l'écriture de l'objet
+     * dans le flux.
      @param arg la session pour laquelle on veut récupérer la liste des cours
      */
-    private ArrayList<Course> listeDeCours = new ArrayList<>();
 
     public void handleLoadCourses(String arg) {
         try{
-            // ???? pt pas necessaire non plus puisqu'en executant serverlauncher ça istancier server et l'executer sur le port 1337:
-            ServerSocket ss = new ServerSocket(1337);
-            Socket client = ss.accept(); // attendre la connexion du client
+            ArrayList<Course> listeDeCours = new ArrayList<>();
 
             //Step 1 : read cours.txt file to get the information
-            File fichierTexte = new File("/src/main/Java/server/data/cours.txt");
-            Scanner cours = new Scanner(fichierTexte);
+            //File fichierTexte = new File("/src/main/Java/server/data/cours.txt");
+            Scanner cours = new Scanner(new File("cours.txt"));
             cours.useDelimiter("\t");
 
             while (cours.hasNext()){
                 String nomCours = cours.next();
-                String sigle = cours.next();
-                String trimestre = cours.next();
+                String sigle = cours.nextLine().substring(1);
+                String trimestre = cours.nextLine().substring(2);
 
-                Course coursDisponibles = new Course(nomCours, sigle, trimestre);
-                this.listeDeCours.add(coursDisponibles);
+                listeDeCours.add(new Course(nomCours, sigle, trimestre));
                 System.out.println(listeDeCours);
             }
-            // Step 2 : Chercher la listes des cours voulues envoyes par le client au socket
+            // Step 2 : Chercher la session voulue envoyeé par le client via socket qui sera l'argument donnée à la
+            // fonction
+            BufferedReader reader = new BufferedReader(new InputStreamReader(client.getInputStream()));
+            arg = reader.readLine();
+
+            reader.close();
 
             //Step 3 : Filtrer les cours selon la session donnée en arguments dans la fonction
             ArrayList<Course> coursFiltres = new ArrayList<>();
@@ -155,16 +159,15 @@ public class Server {
                     coursFiltres.add(lesCours);
                 }
             }
-            System.out.println(coursFiltres);
 
             //Step 4 : Retourner la liste d'objet Courses au client via le socket en utilisant ObjectOutputStream
+            //this.objectOutputStream.writeObject(coursFiltres);
             ObjectOutputStream output = new ObjectOutputStream(client.getOutputStream());
             output.writeObject(coursFiltres);
+            //client.close();
+            //output.close();
 
-            client.close();
-            output.close();
-
-        }catch (IOException ex) {
+        } catch (IOException ex) {
             ex.printStackTrace();
             System.out.println("Erreur lors de la lecture du fichier");
         }
@@ -173,7 +176,8 @@ public class Server {
     /**
      * Récupérer l'objet 'RegistrationForm' envoyé par le client en utilisant 'objectInputStream', l'enregistrer dans
      * un fichier texte et renvoyer un message de confirmation au client.
-     * La méthode gére les exceptions si une erreur se produit lors de la lecture de l'objet, l'écriture dans un fichier ou dans le flux de sortie.
+     * La méthode gére les exceptions si une erreur se produit lors de la lecture de l'objet, l'écriture dans un fichier
+     * ou dans le flux de sortie.
      */
     public void handleRegistration() {
         try {
@@ -198,8 +202,11 @@ public class Server {
             input.close();
             fw.close();
 
-        }catch (IOException | ClassNotFoundException ex){
-            ex.printStackTrace();
+        }catch (ClassNotFoundException e){
+            e.printStackTrace();
+            System.out.println("La classe n'a pas été trouvée");
+        }catch (IOException e){
+            e.printStackTrace();
             System.out.println("Erreur lors de l'inscription");
         }
     }
