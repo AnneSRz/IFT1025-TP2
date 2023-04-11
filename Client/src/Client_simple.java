@@ -144,8 +144,8 @@ public class Client_simple {
 
             //TODO
             // Step 6 : Envoyer l'objet Registrationform au serveur
-            RegistrationForm donneesInscription = new RegistrationForm(prenom, nom, email, matricule, Course cours);
-            objectOutputStream2.writeObject(donneesInscription);
+            //RegistrationForm donneesInscription = new RegistrationForm(prenom, nom, email, matricule, Course cours);
+            //objectOutputStream2.writeObject(donneesInscription);
 
             // Step 7 : Le client affiche ce message a la fin de l'inscription.
             System.out.println("Félicitations! Inscription réussie de " + prenom + " au cours " + cours);
