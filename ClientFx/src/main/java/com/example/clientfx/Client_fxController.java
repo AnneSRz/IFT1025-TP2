@@ -3,29 +3,41 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import com.example.clientfx.modeleClientFx.Course;
 import com.example.clientfx.modeleClientFx.RegistrationForm;
+import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
 
-public class Client_fxController {
+import java.io.IOException;
+import java.net.Socket;
+import java.net.URL;
+import java.net.UnknownHostException;
+import java.util.ResourceBundle;
+
+public class Client_fxController implements Initializable {
+    private Socket socket;
     private Course module1;
     private RegistrationForm module2;
-    @FXML
-    private AnchorPane mainPane;
     @FXML
     private TableView<Course> coursesDisplay;
     @FXML
     private MenuButton coursLists;
     @FXML
     private Button chargementButton, registrer;
-    //@FXML private TextField prenomField, nomField, emailField, matriculeField;
-    //@FXML private Label emailError;
     @FXML
     private Label emailError, matriculeError;
     @FXML
     private TextField emailField, matriculeField;
 
-    public void initialize() {
+    @Override
+    public void initialize(URL url, ResourceBundle resourceBundle) {
+        // Step 1 : Se connecter au serveur;
+        try{
+            this.socket = new Socket("127.0.0.1",1337);
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
         TableColumn<Course, String> codeCol = new TableColumn<>("Code");
         codeCol.setCellValueFactory(new PropertyValueFactory<>("code"));
 
@@ -69,8 +81,8 @@ public class Client_fxController {
         boolean mail = emailValidation(textField1.getText());
         if (!mail) {
             textField1.getStyleClass().remove("invalide");
-           error.setText(msgErreur);
-           textField1.getStyleClass().add("invalide");
+            error.setText(msgErreur);
+            textField1.getStyleClass().add("invalide");
         } else{
             error.setText(null);
         }
