@@ -6,7 +6,6 @@ public class ClientLauncher {
         try {
             clientSimple = new Client_simple(PORT) ;
             clientSimple.charger();
-
         } catch (Exception e) {
             e.printStackTrace();
         }

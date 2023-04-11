@@ -16,8 +16,7 @@ import server.models.RegistrationForm;
 import java.util.Scanner;
 import java.io.FileWriter;
 import java.io.BufferedWriter;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
+import java.io.FileOutputStream;
 
 /**
  * Le serveur peut éxécuter des commandes spécifiques tels que REGISTER_COMMAND et LOAD_COMMAND pour permettre a
@@ -129,43 +128,42 @@ public class Server {
      */
 
     public void handleLoadCourses(String arg) {
-        try{
+        try {
             ArrayList<Course> listeDeCours = new ArrayList<>();
 
             //Step 1 : read cours.txt file to get the information
             //File fichierTexte = new File("/src/main/Java/server/data/cours.txt");
-            Scanner cours = new Scanner(new File("cours.txt"));
-            cours.useDelimiter("\t");
+            Scanner cours = new Scanner(new File("src/main/java/server/data/cours.txt"));
+            // cours.useDelimiter("\t");
 
-            while (cours.hasNext()){
-                String nomCours = cours.next();
-                String sigle = cours.nextLine().substring(1);
-                String trimestre = cours.nextLine().substring(2);
+            while (cours.hasNext()) {
+                String line = cours.nextLine();
+                String[] lesCours = line.split("\t");
+                String nomCours = lesCours[0];
+                String sigle = lesCours[1];
+                String trimestre = lesCours[2];
 
-                listeDeCours.add(new Course(nomCours, sigle, trimestre));
-                System.out.println(listeDeCours);
+                listeDeCours.add(new Course(sigle, nomCours, trimestre));
+
+                //Test 1 : ArrayList de listes de Cours
+                //System.out.println(listeDeCours);
             }
-            // Step 2 : Chercher la session voulue envoyeé par le client via socket qui sera l'argument donnée à la
-            // fonction
-            BufferedReader reader = new BufferedReader(new InputStreamReader(client.getInputStream()));
-            arg = reader.readLine();
-
-            reader.close();
 
             //Step 3 : Filtrer les cours selon la session donnée en arguments dans la fonction
             ArrayList<Course> coursFiltres = new ArrayList<>();
-            for (Course lesCours : listeDeCours){
-                if (lesCours.getSession().equals(arg)){
+            for (Course lesCours : listeDeCours) {
+                if (lesCours.getSession().equals(arg)) {
                     coursFiltres.add(lesCours);
                 }
             }
+            //Test 2 : Pour une session donnée
+            //System.out.println(coursFiltres);
 
             //Step 4 : Retourner la liste d'objet Courses au client via le socket en utilisant ObjectOutputStream
-            //this.objectOutputStream.writeObject(coursFiltres);
-            ObjectOutputStream output = new ObjectOutputStream(client.getOutputStream());
-            output.writeObject(coursFiltres);
-            //client.close();
-            //output.close();
+            this.objectOutputStream = new ObjectOutputStream(client.getOutputStream());
+            this.objectOutputStream.writeObject(coursFiltres);
+
+            this.objectOutputStream.flush();
 
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -182,12 +180,16 @@ public class Server {
     public void handleRegistration() {
         try {
             //Step 1 : Lire object registrationForm from Socket
-
             ObjectInputStream input = new ObjectInputStream(client.getInputStream());
-            RegistrationForm inscription = (RegistrationForm)input.readObject();
-            System.out.println(inscription); // A enlever
+
+            RegistrationForm inscription = (RegistrationForm) input.readObject(); // dans son format serializer ??
 
             //Step 2 : Save the object in Inscription.txt file (attention au format)
+            FileOutputStream fileOs = new FileOutputStream("src/main/java/server/data/inscription.txt");
+            ObjectOutputStream os = new ObjectOutputStream(fileOs);
+            os.writeObject(inscription);
+
+            /*
             FileWriter fw = new FileWriter("inscription.txt");
             BufferedWriter writer = new BufferedWriter(fw);
 
@@ -201,6 +203,7 @@ public class Server {
 
             input.close();
             fw.close();
+            */
 
         }catch (ClassNotFoundException e){
             e.printStackTrace();
