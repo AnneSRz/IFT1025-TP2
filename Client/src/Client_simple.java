@@ -49,7 +49,7 @@ public class Client_simple {
                     scan.next();
                 }
             }
-            String session = "";
+            String session = sessionsListes[sessionChoisie-1];
             for (String varTempSession : sessionsListes) {
                 session = varTempSession;
             }
