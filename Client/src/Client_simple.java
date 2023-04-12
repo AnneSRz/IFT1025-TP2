@@ -2,15 +2,21 @@ import server.models.Course;
 import server.models.RegistrationForm;
 import java.io.*;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Scanner;
 
 public class Client_simple {
 
     private Socket socket;
     private int port;
+    private ObjectOutputStream objectOutputStream;
+    private ObjectInputStream objectInputStream;
+    private ArrayList<Course> coursFiltres;
     public Client_simple(int port) throws IOException{
         //Step 1 : Connecter le client au serveur
         this.port = port;
+        this.socket = new Socket("127.0.0.1",this.port);
     }
     //TODO
     // Pour appeler Server Launcher a partir du client, il faut soit :
@@ -19,9 +25,8 @@ public class Client_simple {
     // ????
     public void charger() {
         try {
-            this.socket = new Socket("127.0.0.1",this.port);
-            ObjectOutputStream objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
-            ObjectInputStream objectInputStream = new ObjectInputStream(socket.getInputStream());
+            this.objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
+            this.objectInputStream = new ObjectInputStream(socket.getInputStream());
 
             // Step 2 : Le client doit choisir la session pour laquelle il veut voir les cours
             int sessionChoisie = 0;
@@ -50,26 +55,23 @@ public class Client_simple {
                 }
             }
             String session = sessionsListes[sessionChoisie-1];
-            for (String varTempSession : sessionsListes) {
-                session = varTempSession;
-            }
+
             System.out.println("les cours offerts pour la session d'" + session + " sont: ");
 
             //Step 3 : Envoie une requete charger au serveur "Charger avec la session choisie"
             String requete = "CHARGER " + session;
             objectOutputStream.writeObject(requete);
+            objectOutputStream.flush();
 
-            //TODO ******************************
             //Step 4 : Le client recupere la liste des cours envoyes par le serveur"
-            Course mesCours = (Course) objectInputStream.readObject();
+            this.coursFiltres = (ArrayList<Course>) objectInputStream.readObject() ;
 
             //Step 5 : Le client affiche ce qui est envoyé par le serveur soit la liste des cours triés
-            System.out.println(mesCours);
+            for (int i = 0; i < coursFiltres.size(); i++ ){
+                System.out.println((i+1)+". " + coursFiltres.get(i).getCode() + " " + coursFiltres.get(i).getName());
+            }
 
-            // Step 6 : Fermer les Streams
-            objectOutputStream.close();
-            objectInputStream.close();
-            // Step 7 : Proceder a la partie de l'inscription
+            // Step 6 : Proceder a la partie de l'inscription
             inscription();
 
         }catch (IOException ex) {
@@ -86,9 +88,10 @@ public class Client_simple {
         String nom = "";
         String email = "";
         String matricule = "";
-        String cours = "";
+        String code = "";
+        RegistrationForm coursInscrit = null;
         try{
-            ObjectOutputStream objectOutputStream2 = new ObjectOutputStream(socket.getOutputStream());
+            //objectOutputStream2 = new ObjectOutputStream(socket.getOutputStream());
             BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
             // Step 1 : Changer de cours ou Inscription
@@ -116,39 +119,47 @@ public class Client_simple {
                     // Step 2 : Permettre a l'utilisateur de faire un autre choix
                         charger();
                 case 2 -> {
-                    // Step 3 : Le client veut s'inscrire à un autre cours
-                    System.out.print("Veillez saisir votre prenom: ");
+                    // Step 3 : Le client veut s'inscrire à un cours
+                    System.out.print("Veuillez saisir votre prenom: ");
                     prenom = br.readLine();
-                    System.out.print("Veillez saisir votre nom: ");
+                    System.out.print("Veuillez saisir votre nom: ");
                     nom = br.readLine();
-                    System.out.print("Veillez saisir votre email: ");
+                    System.out.print("Veuillez saisir votre email: ");
                     email = br.readLine();
-                    System.out.print("Veillez saisir votre matricule: ");
+                    System.out.print("Veuillez saisir votre matricule: ");
                     matricule = br.readLine();
-                    System.out.print("Veillez saisir le code du cours: ");
-                    cours = br.readLine().toUpperCase();
-                    System.out.println(cours);
+                    System.out.print("Veuillez saisir le code du cours: ");
+                    code = br.readLine().toUpperCase();
 
-                    //TODO
                     // Step 4 : Valider le cours choisi - code du cours (le cours ou le client s'inscris) doit être
                     // présent dans la liste des cours disponibles pour la session en question
+                    Course coursCours = null;
+                    for (Course element : coursFiltres){
+                        //element.getCode().compareTo(code) == 0
+                        if (element.getCode().compareTo(code) == 0){
+                            coursCours = element;
+                            break;
+                        }else{
+                            System.out.println("Vous devez choisir un cours qui se trouve dans la liste affichée " +
+                                    "précédemment pour la session choisie. Ex: IFT1025" );
+                            inscription();
+                        }
+                    }
+                    coursInscrit = new RegistrationForm(prenom,nom,email,matricule,coursCours );
                 }
                 default -> {
                 }
-
             }
             // Step 5 : Envoyer une requete Inscription au server
-            String requeteInscription = "Inscription " ;
-            objectOutputStream2.writeObject(requeteInscription);
-            objectOutputStream2.flush(); // Envoyer la requete tout de suite
+            String requeteInscription = "INSCRIRE" ;
+            //objectOutputStream.writeObject(requeteInscription);
+            //objectOutputStream.flush(); // Envoyer la requete tout de suite
 
-            //TODO
             // Step 6 : Envoyer l'objet Registrationform au serveur
-            //RegistrationForm donneesInscription = new RegistrationForm(prenom, nom, email, matricule, Course cours);
-            //objectOutputStream2.writeObject(donneesInscription);
+           // objectOutputStream.writeObject(coursInscrit);
 
             // Step 7 : Le client affiche ce message a la fin de l'inscription.
-            System.out.println("Félicitations! Inscription réussie de " + prenom + " au cours " + cours);
+            System.out.println("Félicitations! Inscription réussie de " + prenom + " au cours " + code);
         }catch (IOException e) {
             e.printStackTrace();
             System.out.println("Erreur au courant de l'inscription");

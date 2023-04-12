@@ -157,13 +157,12 @@ public class Server {
                 }
             }
             //Test 2 : Pour une session donnée
-            //System.out.println(coursFiltres);
+            System.out.println(coursFiltres);
 
             //Step 4 : Retourner la liste d'objet Courses au client via le socket en utilisant ObjectOutputStream
-            this.objectOutputStream = new ObjectOutputStream(client.getOutputStream());
             this.objectOutputStream.writeObject(coursFiltres);
+            this.objectOutputStream.close();
 
-            this.objectOutputStream.flush();
 
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -188,6 +187,7 @@ public class Server {
             FileOutputStream fileOs = new FileOutputStream("src/main/java/server/data/inscription.txt");
             ObjectOutputStream os = new ObjectOutputStream(fileOs);
             os.writeObject(inscription);
+            os.close();
 
             /*
             FileWriter fw = new FileWriter("inscription.txt");
