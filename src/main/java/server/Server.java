@@ -159,8 +159,7 @@ public class Server {
 
             //Step 4 : Retourner la liste d'objet Courses au client via le socket en utilisant ObjectOutputStream
             this.objectOutputStream.writeObject(coursFiltres);
-            //this.objectOutputStream.close();
-
+            this.objectOutputStream.flush();
 
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -176,38 +175,37 @@ public class Server {
      */
     public void handleRegistration() {
         try {
-            //Step 1 : Lire object registrationForm from Socket
-            RegistrationForm donneesInscription = (RegistrationForm) objectInputStream.readObject();
 
-            //Step 2 : Save the object in Inscription.txt file (attention au format)
-            //FileOutputStream fileOs = new FileOutputStream("src/main/java/server/data/inscription.txt");
-            //this.objectOutputStream = new ObjectOutputStream(fileOs);
-            //this.objectOutputStream.writeObject(donneesInscription);
-
-            FileWriter fw = new FileWriter("src/main/java/server/data/inscription.txt");
+            FileWriter fw = new FileWriter("src/main/java/server/data/inscription.txt", true);
             BufferedWriter writer = new BufferedWriter(fw);
 
-            //Step 2.1 : Write object in inscription.txt
-            writer.write(donneesInscription.getCourse().getSession() + "\t");
-            writer.write(donneesInscription.getCourse().getCode() + "\t");
-            writer.write(donneesInscription.getMatricule() + "\t");
-            writer.write(donneesInscription.getPrenom()+ "\t");
-            writer.write(donneesInscription.getNom() + "\t");
-            writer.write(donneesInscription.getEmail() + "\t");
+            //Step 1 : Lire object registrationForm from Socket
+            ArrayList<RegistrationForm> donneesInscription = (ArrayList<RegistrationForm>) objectInputStream.readObject();
+
+            //ArrayList<RegistrationForm> test = new ArrayList<>();
+            //test.add(new RegistrationForm("Manu","Rollin","manuPooP@hotmail.com","22222222",new Course("Programmation","IFT1015","Automne")));
+            for (RegistrationForm formulaireInscription : donneesInscription){
+                writer.append("\n" + formulaireInscription.getCourse().getSession() +"\t"+
+                        formulaireInscription.getCourse().getCode() + "\t" + formulaireInscription.getMatricule() +
+                        "\t" + formulaireInscription.getPrenom() + "\t" + formulaireInscription.getNom() + "\t" +
+                        formulaireInscription.getEmail());
+            }
+            writer.close();
 
             //Step 3 : Envoie de la confirmation d'inscriptioin"
-            String confirmation = "Félicitations! Inscription réussie de " + donneesInscription.getPrenom() +
-                    " au cours " + donneesInscription.getCourse().getCode() ;
-            objectOutputStream.writeObject(confirmation);
-            objectOutputStream.flush();
+            for (int i = 0; i < donneesInscription.size(); i++ ){
+                String confirmation = "Félicitations! Inscription réussie de " + donneesInscription.get(i).getPrenom() +
+                        " au cours "  + donneesInscription.get(i).getCourse().getCode();
+
+                this.objectOutputStream.writeObject(confirmation);
+            }
 
 
-        }catch (ClassNotFoundException e){
-            e.printStackTrace();
-            System.out.println("La classe n'a pas été trouvée");
-        }catch (IOException e){
+        } catch (IOException e){
             e.printStackTrace();
             System.out.println("Erreur lors de l'inscription");
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
         }
     }
 }
