@@ -135,8 +135,6 @@ public class Client_simple {
                     // présent dans la liste des cours disponibles pour la session en question
                     Course coursCours = null;
                     for (Course element : coursFiltres){
-                        System.out.println(code);
-                        System.out.println(element.getCode());
                         if (element.getCode().compareTo(code) == 0){
                             coursCours = element;
                             break;
@@ -159,7 +157,7 @@ public class Client_simple {
 
             //Step 6 : Envoyer l'objet Registrationform au serveur
             objectOutputStream.writeObject(coursInscrit);
-            objectOutputStream.writeObject(coursInscrit);
+            objectOutputStream.flush();
             //objectOutputStream.flush(); // Envoyer la requete tout de suite
 
             // Step 7 : Lire le message de confirmation du serveur.
