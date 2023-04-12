@@ -17,6 +17,8 @@ public class Client_simple {
         //Step 1 : Connecter le client au serveur
         this.port = port;
         this.socket = new Socket("127.0.0.1",this.port);
+        this.objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
+        this.objectInputStream = new ObjectInputStream(socket.getInputStream());
     }
     //TODO
     // Pour appeler Server Launcher a partir du client, il faut soit :
@@ -25,8 +27,6 @@ public class Client_simple {
     // ????
     public void charger() {
         try {
-            this.objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
-            this.objectInputStream = new ObjectInputStream(socket.getInputStream());
 
             // Step 2 : Le client doit choisir la session pour laquelle il veut voir les cours
             int sessionChoisie = 0;
@@ -135,7 +135,8 @@ public class Client_simple {
                     // présent dans la liste des cours disponibles pour la session en question
                     Course coursCours = null;
                     for (Course element : coursFiltres){
-                        //element.getCode().compareTo(code) == 0
+                        System.out.println(code);
+                        System.out.println(element.getCode());
                         if (element.getCode().compareTo(code) == 0){
                             coursCours = element;
                             break;
@@ -145,27 +146,23 @@ public class Client_simple {
                             inscription();
                         }
                     }
-                    coursInscrit = new RegistrationForm(prenom,nom,email,matricule,coursCours );
+                    coursInscrit = new RegistrationForm(prenom,nom,email,matricule,coursCours);
                 }
-                default -> {
-                }
+
             }
             // Step 5 : Envoyer une requete Inscription au server
-            String requeteInscription = "INSCRIRE" ;
-            //objectOutputStream.writeObject(requeteInscription);
-            //objectOutputStream.flush(); // Envoyer la requete tout de suite
+            String requeteInscription = "INSCRIRE " + coursInscrit;
+            this.objectOutputStream.writeObject(requeteInscription);
 
             // Step 6 : Envoyer l'objet Registrationform au serveur
-           // objectOutputStream.writeObject(coursInscrit);
+            //this.objectOutputStream.writeObject(coursInscrit);
+            this.objectOutputStream.flush(); // Envoyer la requete tout de suite
 
-            // Step 7 : Le client affiche ce message a la fin de l'inscription.
-            System.out.println("Félicitations! Inscription réussie de " + prenom + " au cours " + code);
         }catch (IOException e) {
             e.printStackTrace();
             System.out.println("Erreur au courant de l'inscription");
         }
+        // Step 7 : Lire le message de confirmation du serveur.
+        System.out.println("Félicitations! Inscription réussie de " + prenom + " au cours " + code);
     }
 }
-
-
-

@@ -132,9 +132,7 @@ public class Server {
             ArrayList<Course> listeDeCours = new ArrayList<>();
 
             //Step 1 : read cours.txt file to get the information
-            //File fichierTexte = new File("/src/main/Java/server/data/cours.txt");
             Scanner cours = new Scanner(new File("src/main/java/server/data/cours.txt"));
-            // cours.useDelimiter("\t");
 
             while (cours.hasNext()) {
                 String line = cours.nextLine();
@@ -161,7 +159,7 @@ public class Server {
 
             //Step 4 : Retourner la liste d'objet Courses au client via le socket en utilisant ObjectOutputStream
             this.objectOutputStream.writeObject(coursFiltres);
-            this.objectOutputStream.close();
+            //this.objectOutputStream.close();
 
 
         } catch (IOException ex) {
@@ -179,31 +177,30 @@ public class Server {
     public void handleRegistration() {
         try {
             //Step 1 : Lire object registrationForm from Socket
-            ObjectInputStream input = new ObjectInputStream(client.getInputStream());
-
-            RegistrationForm inscription = (RegistrationForm) input.readObject(); // dans son format serializer ??
+            RegistrationForm donneesInscription = (RegistrationForm) objectInputStream.readObject();
 
             //Step 2 : Save the object in Inscription.txt file (attention au format)
-            FileOutputStream fileOs = new FileOutputStream("src/main/java/server/data/inscription.txt");
-            ObjectOutputStream os = new ObjectOutputStream(fileOs);
-            os.writeObject(inscription);
-            os.close();
+            //FileOutputStream fileOs = new FileOutputStream("src/main/java/server/data/inscription.txt");
+            //this.objectOutputStream = new ObjectOutputStream(fileOs);
+            //this.objectOutputStream.writeObject(donneesInscription);
 
-            /*
-            FileWriter fw = new FileWriter("inscription.txt");
+            FileWriter fw = new FileWriter("src/main/java/server/data/inscription.txt");
             BufferedWriter writer = new BufferedWriter(fw);
 
             //Step 2.1 : Write object in inscription.txt
-            writer.write(inscription.getCourse().getSession() + "\t");
-            writer.write(inscription.getCourse().getCode() + "\t");
-            writer.write(inscription.getMatricule() + "\t");
-            writer.write(inscription.getPrenom()+ "\t");
-            writer.write(inscription.getNom() + "\t");
-            writer.write(inscription.getEmail() + "\t");
+            writer.write(donneesInscription.getCourse().getSession() + "\t");
+            writer.write(donneesInscription.getCourse().getCode() + "\t");
+            writer.write(donneesInscription.getMatricule() + "\t");
+            writer.write(donneesInscription.getPrenom()+ "\t");
+            writer.write(donneesInscription.getNom() + "\t");
+            writer.write(donneesInscription.getEmail() + "\t");
 
-            input.close();
-            fw.close();
-            */
+            //Step 3 : Envoie de la confirmation d'inscriptioin"
+            String confirmation = "Félicitations! Inscription réussie de " + donneesInscription.getPrenom() +
+                    " au cours " + donneesInscription.getCourse().getCode() ;
+            objectOutputStream.writeObject(confirmation);
+            objectOutputStream.flush();
+
 
         }catch (ClassNotFoundException e){
             e.printStackTrace();
