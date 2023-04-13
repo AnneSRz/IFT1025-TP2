@@ -1,5 +1,7 @@
 import server.models.Course;
 import server.models.RegistrationForm;
+
+import javax.swing.border.SoftBevelBorder;
 import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -10,23 +12,19 @@ public class Client_simple {
 
     private Socket socket;
     private int port;
-    private ObjectOutputStream objectOutputStream;
-    private ObjectInputStream objectInputStream;
+   // private ObjectOutputStream objectOutputStream;
+   // private ObjectInputStream objectInputStream;
     private ArrayList<Course> coursFiltres;
     public Client_simple(int port) throws IOException{
         //Step 1 : Connecter le client au serveur
         this.port = port;
-        this.socket = new Socket("127.0.0.1",this.port);
-        this.objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
-        this.objectInputStream = new ObjectInputStream(socket.getInputStream());
     }
-    //TODO
-    // Pour appeler Server Launcher a partir du client, il faut soit :
-    // 1. Appeler le fichier server.jar à partir du client en utilisant la ligne de commande, ou
-    // 2. Appeler le ServerLauncher et Client en utilisant le multithreading.
-    // ????
+
     public void charger() {
         try {
+            Socket socket = new Socket("127.0.0.1",this.port);
+            ObjectOutputStream objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
+            ObjectInputStream objectInputStream = new ObjectInputStream(socket.getInputStream());
 
             // Step 2 : Le client doit choisir la session pour laquelle il veut voir les cours
             int sessionChoisie = 0;
@@ -71,6 +69,10 @@ public class Client_simple {
                 System.out.println((i+1)+". " + coursFiltres.get(i).getCode() + " " + coursFiltres.get(i).getName());
             }
 
+            objectOutputStream.close();
+            objectInputStream.close();
+            socket.close();
+
             // Step 6 : Proceder a la partie de l'inscription
             inscription();
 
@@ -81,6 +83,7 @@ public class Client_simple {
             throw new RuntimeException(e);
         }
     }
+
     public void inscription() {
 
         int optionVoulue = 0;
@@ -91,7 +94,9 @@ public class Client_simple {
         String code = "";
         RegistrationForm coursInscrit = null;
         try{
-            //objectOutputStream2 = new ObjectOutputStream(socket.getOutputStream());
+            Socket socket = new Socket("127.0.0.1",this.port);
+            ObjectOutputStream objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
+            ObjectInputStream objectInputStream = new ObjectInputStream(socket.getInputStream());
             BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
             // Step 1 : Changer de cours ou Inscription
@@ -115,9 +120,13 @@ public class Client_simple {
                 }
             }
             switch (optionVoulue) {
-                case 1 ->
+                case 1 -> {
                     // Step 2 : Permettre a l'utilisateur de faire un autre choix
-                        charger();
+                    socket.close();
+                    objectOutputStream.close();
+                    objectInputStream.close();
+                    charger();
+                }
                 case 2 -> {
                     // Step 3 : Le client veut s'inscrire à un cours
                     System.out.print("Veuillez saisir votre prenom: ");
@@ -134,39 +143,51 @@ public class Client_simple {
                     // Step 4 : Valider le cours choisi - code du cours (le cours ou le client s'inscris) doit être
                     // présent dans la liste des cours disponibles pour la session en question
                     Course coursCours = null;
-                    for (Course element : coursFiltres){
-                        if (element.getCode().compareTo(code) == 0){
+                    boolean codeValide = false;
+                    for (Course element : coursFiltres) {
+                        if (element.getCode().compareTo(code) == 0) {
                             coursCours = element;
+                            codeValide = true;
                             break;
-                        }else{
-                            System.out.println("Vous devez choisir un cours qui se trouve dans la liste affichée " +
-                                    "précédemment pour la session choisie. Ex: IFT1025" );
-                            inscription();
                         }
                     }
-                    coursInscrit = new RegistrationForm(prenom,nom,email,matricule,coursCours);
+                    if(!codeValide) {
+                        System.out.println("Vous devez choisir un cours qui se trouve dans la liste affichée " +
+                                    "précédemment pour la session choisie. Ex: IFT1025");
+                        socket.close();
+                        objectOutputStream.close();
+                        objectInputStream.close();
+                        inscription();
+                    }
+                    try {
+
+                        coursInscrit = new RegistrationForm(prenom, nom, email, matricule, coursCours);
+                        // Step 5 : Envoyer une requete Inscription au server
+                        String requeteInscription = "INSCRIRE";
+                        objectOutputStream.writeObject(requeteInscription);
+                        objectOutputStream.flush(); // jusqu'a la ça marche la requete est envoyé
+
+                        //Step 6 : Envoyer l'objet Registrationform au serveur
+                        objectOutputStream.writeObject(coursInscrit);
+                        objectOutputStream.flush();
+
+                        // Step 7 : Lire le message de confirmation du serveur.
+                        Object msgConfirmation = objectInputStream.readObject();
+                        String confirmation = (String) msgConfirmation;
+                        System.out.println(confirmation);
+
+                    }catch (IOException ex){
+                        ex.printStackTrace();
+                        System.out.println("Une erreur s'est produite lors de l'envoie des données d'inscription");
+                    } catch (ClassNotFoundException e) {
+                        throw new RuntimeException(e);
+                    }
                 }
 
             }
-            // Step 5 : Envoyer une requete Inscription au server
-            String requeteInscription = "INSCRIRE" ;
-            objectOutputStream.writeObject(requeteInscription);
-
-            objectOutputStream.writeObject(requeteInscription);
-            objectOutputStream.flush();
-
-            //Step 6 : Envoyer l'objet Registrationform au serveur
-            objectOutputStream.writeObject(coursInscrit);
-            objectOutputStream.flush();
-            //objectOutputStream.flush(); // Envoyer la requete tout de suite
-
-            // Step 7 : Lire le message de confirmation du serveur.
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(objectInputStream));
-            String msgConfirmation = bufferedReader.readLine();
-            System.out.println(msgConfirmation);
+            socket.close();
             objectOutputStream.close();
-
-
+            objectInputStream.close();
         }catch (IOException e) {
             e.printStackTrace();
             System.out.println("Erreur au courant de l'inscription");

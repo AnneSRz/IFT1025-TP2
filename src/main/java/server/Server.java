@@ -2,25 +2,18 @@ package server;
 
 import javafx.util.Pair;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Arrays;
-
 import server.models.Course;
-import java.io.File;
 import server.models.RegistrationForm;
 import java.util.Scanner;
-import java.io.FileWriter;
-import java.io.BufferedWriter;
-import java.io.FileOutputStream;
 
 /**
  * Le serveur peut éxécuter des commandes spécifiques tels que REGISTER_COMMAND et LOAD_COMMAND pour permettre a
- * un client charger une liste de cours pour une session voulue et s'y inscrire.
+ * un client de charger une liste de cours pour une session voulue et s'y inscrire.
  * Cette classe permet de créer un serveur et ensuite de lire et écrire des objets entre le serveur et le client,
  * tout en gérant les commandes qui sont envoyées par le client.
  */
@@ -35,12 +28,13 @@ public class Server {
     private final ArrayList<EventHandler> handlers;
 
     /**
-     * Ce constructeur en prenant un paramètre type int, crèe ue instance se refère à la classe server sur un port,
-     * ce port est donné et la limite d'attente de connexion est de 1, ça définit un eventHandler pour gérer les
-     * évènements sur le serveur
+     * Ce constructeur en prenant un paramètre type int, crèe ue instance qui se refère à la classe server sur un port,
+     * ce port est donné et impose une limite de connexion qui est de 1 (file d'attente), Il définit aussi un
+     * eventHandler pour gérer les évènements.
      *
      * @param port le numero du port pour les connexions au serveur
-     * @throws IOException Pour les erreurs qui sont produites lors le serverSocket est cree.
+     * @throws IOException pour les erreurs qui sont produites lors le serverSocket est crée.
+     *
      */
     public Server(int port) throws IOException {
         this.server = new ServerSocket(port, 1);
@@ -50,16 +44,19 @@ public class Server {
 
     /**
      * Ajoute un EventHandler pour s'occuper des connexions
-     * @param h l'evenemnt EventHandler qui est ajouter pour s'coccuper des connexions
+     * @param h l'evenemnt EventHandler qui gére les connexions
      */
     public void addEventHandler(EventHandler h) {
         this.handlers.add(h);
     }
 
     /**
-     * C'est une metohode ça??
-     * @param cmd
-     * @param arg
+     * Cette méthode avec la commande et l'argument associé à cette dernière communique avec les events handlers pour
+     * qu'elle appelle la méthode qui correspond à la commande et l'argument en paramètre.
+     *
+     * @param cmd commande qui va être transmise au handlers qui reprendre une action qui va être éxécutée
+     * @param arg argument qui va être utilisé avec la commande
+     *
      */
     private void alertHandlers(String cmd, String arg) {
         for (EventHandler h : this.handlers) {
@@ -68,6 +65,10 @@ public class Server {
     }
 
     /**
+     * Cette méthode initialise  et ecoute les connexions au serveur, Lorsqu'un client est connecté, il traite les
+     * commandes qui sont envoyés. Il assure aussi la communication entre le serveur et le client.
+     *
+     * @throws IOException Au où cas des erreurs se produisent lors de la connexion ou de la transmission des données
      *
      */
     public void run() {
@@ -87,6 +88,16 @@ public class Server {
         }
     }
 
+    /**
+     * La méthode listen() écoute les informations et lit les lignes de texte qui lui sont transmises par le client via le
+     * socket. Après avoir obtenu la commande et l'argument avec proccesCommandeLine();, elle appelle la méthode
+     * alertHandlers en lui passant la commande et l'argument.
+     *
+     * @throws IOException pour les erreurs qui se prosuident lors de la lecture ou de l'écoute
+     * @throws ClassNotFoundException lance une exception si la classe de l'object reçcu (par exmple Course) n'existe
+     * pas ou n'est pas trouvée
+     *
+     */
     public void listen() throws IOException, ClassNotFoundException {
         String line;
         if ((line = this.objectInputStream.readObject().toString()) != null) {
@@ -97,6 +108,11 @@ public class Server {
         }
     }
 
+    /**
+     *
+     * @param line la ligne de commande
+     * @return
+     */
     public Pair<String, String> processCommandLine(String line) {
         String[] parts = line.split(" ");
         String cmd = parts[0];
@@ -104,12 +120,19 @@ public class Server {
         return new Pair<>(cmd, args);
     }
 
+    /**
+     * @throws IOException
+     */
     public void disconnect() throws IOException {
         objectOutputStream.close();
         objectInputStream.close();
         client.close();
     }
 
+    /**
+     * @param cmd
+     * @param arg
+     */
     public void handleEvents(String cmd, String arg) {
         if (cmd.equals(REGISTER_COMMAND)) {
             handleRegistration();
@@ -130,21 +153,24 @@ public class Server {
     public void handleLoadCourses(String arg) {
         try {
             ArrayList<Course> listeDeCours = new ArrayList<>();
+            try {
+                //Step 1 : read cours.txt file to get the information
+                Scanner cours = new Scanner(new File("src/main/java/server/data/cours.txt"));
 
-            //Step 1 : read cours.txt file to get the information
-            Scanner cours = new Scanner(new File("src/main/java/server/data/cours.txt"));
+                while (cours.hasNext()) {
+                    String line = cours.nextLine();
+                    String[] lesCours = line.split("\t");
+                    String nomCours = lesCours[0];
+                    String sigle = lesCours[1];
+                    String trimestre = lesCours[2];
 
-            while (cours.hasNext()) {
-                String line = cours.nextLine();
-                String[] lesCours = line.split("\t");
-                String nomCours = lesCours[0];
-                String sigle = lesCours[1];
-                String trimestre = lesCours[2];
+                    listeDeCours.add(new Course(sigle, nomCours, trimestre));
 
-                listeDeCours.add(new Course(sigle, nomCours, trimestre));
-
-                //Test 1 : ArrayList de listes de Cours
-                //System.out.println(listeDeCours);
+                    //Test 1 : ArrayList de listes de Cours
+                    //System.out.println(listeDeCours);
+                }
+            }catch (FileNotFoundException fe) {
+                System.out.println("Le fichier n'a pas été trouvé");
             }
 
             //Step 3 : Filtrer les cours selon la session donnée en arguments dans la fonction
@@ -163,7 +189,7 @@ public class Server {
 
         } catch (IOException ex) {
             ex.printStackTrace();
-            System.out.println("Erreur lors de la lecture du fichier");
+            System.out.println("Erreur lors de l'écriture du fichier");
         }
     }
 
@@ -180,10 +206,12 @@ public class Server {
             BufferedWriter writer = new BufferedWriter(fw);
 
             //Step 1 : Lire object registrationForm from Socket
-            ArrayList<RegistrationForm> donneesInscription = (ArrayList<RegistrationForm>) objectInputStream.readObject();
+            RegistrationForm donneesInscriptionRecues = (RegistrationForm) objectInputStream.readObject();
 
-            //ArrayList<RegistrationForm> test = new ArrayList<>();
-            //test.add(new RegistrationForm("Manu","Rollin","manuPooP@hotmail.com","22222222",new Course("Programmation","IFT1015","Automne")));
+            // Step 2 : La mettre sous le format d'une liste pour pouvoir passer à travers
+            ArrayList<RegistrationForm> donneesInscription = new ArrayList<>();
+            donneesInscription.add(donneesInscriptionRecues);
+
             for (RegistrationForm formulaireInscription : donneesInscription){
                 writer.append("\n" + formulaireInscription.getCourse().getSession() +"\t"+
                         formulaireInscription.getCourse().getCode() + "\t" + formulaireInscription.getMatricule() +
@@ -200,11 +228,10 @@ public class Server {
                 this.objectOutputStream.writeObject(confirmation);
             }
 
-
-        } catch (IOException e){
+        }catch (IOException e){
             e.printStackTrace();
-            System.out.println("Erreur lors de l'inscription");
-        } catch (ClassNotFoundException e) {
+            System.out.println("Erreur de l'écriture des données d'inscription");
+        }catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
     }
