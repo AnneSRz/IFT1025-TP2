@@ -31,14 +31,12 @@ public class Client_fxController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        //Step 1 : Se connecter au serveur;
+        // Step 1 : Se connecter au serveur;
         try{
             this.socket = new Socket("127.0.0.1",1337);
         } catch (IOException e) {
-           e.printStackTrace();
-            System.out.println("Impossible de se connecter au serveur");
+            e.printStackTrace();
             throw new RuntimeException(e);
-
         }
         TableColumn<Course, String> codeCol = new TableColumn<>("Code");
         codeCol.setCellValueFactory(new PropertyValueFactory<>("code"));
@@ -112,7 +110,7 @@ public class Client_fxController implements Initializable {
 
 // Ajouter les choix a la liste deroulante "choix de session"
 
-    // Action pour envoyer
+// Action pour envoyer
 
     /*
     submitButton.setOnAction(new EventHandler<ActionEvent>() {

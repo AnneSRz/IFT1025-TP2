@@ -22,21 +22,21 @@
                </font>
             </Label>
             <TableView fx:id="coursesDisplay" layoutX="23.0" layoutY="60.0" prefHeight="320.0" prefWidth="300.0">
-              <columns>
-                <TableColumn prefWidth="150.0" text="Code" />
-                <TableColumn prefWidth="150.0" text="Cours" />
-              </columns>
+               <columns>
+                  <TableColumn prefWidth="150.0" text="Code" />
+                  <TableColumn prefWidth="150.0" text="Cours" />
+               </columns>
             </TableView>
          </children></Pane>
       <!-- Pane 2 : l'utilisateur peut choisir la session pour laquelle il peut voir les cours -->
       <Pane layoutX="9.0" layoutY="409.0" prefHeight="84.0" prefWidth="327.0" style="-fx-background-color: #F0F4C3;">
          <children>
             <MenuButton fx:id="coursLists" layoutX="14.0" layoutY="25.0" mnemonicParsing="false" onAction="#selection" prefHeight="34.0" prefWidth="156.0" styleClass="coursLists" text="Choix de Session">
-              <items>
-                 <MenuItem mnemonicParsing="false" text="Hiver" />
-                 <MenuItem mnemonicParsing="false" text="Automne" />
-                 <MenuItem mnemonicParsing="false" text="Ete" />
-              </items>
+               <items>
+                  <MenuItem mnemonicParsing="false" text="Hiver" />
+                  <MenuItem mnemonicParsing="false" text="Automne" />
+                  <MenuItem mnemonicParsing="false" text="Ete" />
+               </items>
                <font>
                   <Font size="15.0" />
                </font>
