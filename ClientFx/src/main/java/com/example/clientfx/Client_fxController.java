@@ -31,13 +31,15 @@ public class Client_fxController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        // Step 1 : Se connecter au serveur;
-       // try{
-           // this.socket = new Socket("127.0.0.1",1337);
-       // } catch (IOException e) {
-           // e.printStackTrace();
-            // throw new RuntimeException(e);
-        //}
+        //Step 1 : Se connecter au serveur;
+        try{
+            this.socket = new Socket("127.0.0.1",1337);
+        } catch (IOException e) {
+           e.printStackTrace();
+            System.out.println("Impossible de se connecter au serveur");
+            throw new RuntimeException(e);
+
+        }
         TableColumn<Course, String> codeCol = new TableColumn<>("Code");
         codeCol.setCellValueFactory(new PropertyValueFactory<>("code"));
 

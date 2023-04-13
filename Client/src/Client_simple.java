@@ -1,19 +1,13 @@
 import server.models.Course;
 import server.models.RegistrationForm;
 
-import javax.swing.border.SoftBevelBorder;
 import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Scanner;
 
 public class Client_simple {
-
-    private Socket socket;
     private int port;
-   // private ObjectOutputStream objectOutputStream;
-   // private ObjectInputStream objectInputStream;
     private ArrayList<Course> coursFiltres;
     public Client_simple(int port) throws IOException{
         //Step 1 : Connecter le client au serveur
@@ -153,7 +147,7 @@ public class Client_simple {
                     }
                     if(!codeValide) {
                         System.out.println("Vous devez choisir un cours qui se trouve dans la liste affichée " +
-                                    "précédemment pour la session choisie. Ex: IFT1025");
+                                "précédemment pour la session choisie. Ex: IFT1025");
                         socket.close();
                         objectOutputStream.close();
                         objectInputStream.close();
