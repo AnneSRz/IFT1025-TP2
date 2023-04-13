@@ -1,4 +1,5 @@
 package com.example.clientfx.modeleClientFx;
+
 import java.io.Serializable;
 
 public class Course implements Serializable {
@@ -46,3 +47,4 @@ public class Course implements Serializable {
                 '}';
     }
 }
+
