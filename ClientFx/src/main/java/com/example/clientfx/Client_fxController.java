@@ -1,5 +1,7 @@
 package com.example.clientfx;
+
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import com.example.clientfx.modeleClientFx.Course;
 import com.example.clientfx.modeleClientFx.RegistrationForm;
@@ -7,15 +9,21 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
-
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.URL;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.ResourceBundle;
 
 public class Client_fxController implements Initializable {
-    private Socket socket;
+    //<editor-fold desc="Attributs">
+    @FXML
+    private ChoiceBox choixSession;
+    private String session;
+    private ArrayList<Course> coursFiltres;
     private Course module1;
     private RegistrationForm module2;
     @FXML
@@ -28,29 +36,64 @@ public class Client_fxController implements Initializable {
     private Label emailError, matriculeError;
     @FXML
     private TextField emailField, matriculeField;
+    //</editor-fold>
+
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+
         // Step 1 : Se connecter au serveur;
-        try{
-            this.socket = new Socket("127.0.0.1",1337);
+        try {
+            Socket socket = new Socket("127.0.0.1",1337);
+
+            this.session = (String) this.choixSession.getSelectionModel().getSelectedItem();
+            if(session == null){
+                this.session = (String) this.choixSession.getSelectionModel().getSelectedItem();
+            }else{
+                this.session = (String) this.choixSession.getSelectionModel().getSelectedItem();
+                handleCharge();
+            }
+            socket.close();
+
         } catch (IOException e) {
             e.printStackTrace();
-            throw new RuntimeException(e);
+            System.out.println("Une erreur s'est produite lors de la connesion au serveur");
         }
-        TableColumn<Course, String> codeCol = new TableColumn<>("Code");
-        codeCol.setCellValueFactory(new PropertyValueFactory<>("code"));
-
-        TableColumn<Course, String> coursCol = new TableColumn<>("Cours");
-        coursCol.setCellValueFactory(new PropertyValueFactory<>("nom"));
-
-        coursesDisplay.getColumns().addAll(codeCol, coursCol);
-        //coursesDisplay.getItems().addAll(new Course("code1", "cours1"), new Course("code2", "cours2"));
     }
-
     @FXML
     public void handleCharge() {
-        System.out.println("Chargement des cours");
+        //Step 1 : Aller chercher la session choisie dans la liste déroulante.
+        try {
+            this.session = (String) this.choixSession.getSelectionModel().getSelectedItem();
+
+            Socket socket = new Socket("127.0.0.1",1337);
+            ObjectOutputStream objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
+            ObjectInputStream objectInputStream = new ObjectInputStream(socket.getInputStream());
+
+            System.out.println(session);
+            System.out.println("Chargement des cours");
+
+            //Step 2 : Envoie une requete charger au serveur "Avec la session choisie"
+            String requete = "CHARGER " + this.session;
+            objectOutputStream.writeObject(requete);
+            objectOutputStream.flush();
+            try{
+                //Step 3 : Le client recupere la liste des cours envoyes par le serveur"
+                this.coursFiltres = (ArrayList) objectInputStream.readObject() ;
+
+                //Step 4 : Affhiché la liste des cours dans le tableau
+                for (int i = 0; i < coursFiltres.size(); i++ ){
+                    System.out.println((i+1)+". " + coursFiltres.get(i).getCode() + " " + coursFiltres.get(i).getName());
+                }
+                objectOutputStream.close();
+                objectInputStream.close();
+            } catch (ClassNotFoundException e) {
+                System.out.print("Erreur lors du chargement la liste de cours n'a pas pu être affiché");
+                throw new RuntimeException(e);
+            }
+        } catch (IOException e) {
+            System.out.println("Erreur lors de l'envoie de la requête");
+        }
     }
 
     public void selection(ActionEvent actionEvent) {
@@ -136,5 +179,13 @@ public class Client_fxController implements Initializable {
                     "Registration Successful!", "Welcome " + nameField.getText());
         }
     });
+     TableColumn<Course, String> codeCol = new TableColumn<>("Code");
+        codeCol.setCellValueFactory(new PropertyValueFactory<>("code"));
+
+        TableColumn<Course, String> coursCol = new TableColumn<>("Cours");
+        coursCol.setCellValueFactory(new PropertyValueFactory<>("nom"));
+
+        coursesDisplay.getColumns().addAll(codeCol, coursCol);
+        //coursesDisplay.getItems().addAll(new Course("code1", "cours1"), new Course("code2", "cours2"));
 
      */

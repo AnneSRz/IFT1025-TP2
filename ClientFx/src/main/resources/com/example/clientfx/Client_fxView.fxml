@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.String?>
+<?import javafx.collections.FXCollections?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ChoiceBox?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.MenuButton?>
-<?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
@@ -14,7 +15,7 @@
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="700.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.clientfx.Client_fxController">
    <!-- Pane 1 : La où les cours filtrés seront affichés -->
    <children>
-      <Pane prefHeight="395.0" prefWidth="345.0" style="-fx-background-color: #F0F4C3;">
+      <Pane prefHeight="395.0" prefWidth="345.0" style="-fx-background-color: #EEEEE4;">
          <children>
             <Label alignment="CENTER" contentDisplay="TOP" layoutX="87.0" layoutY="17.0" prefHeight="34.0" prefWidth="198.0" text="Liste de Cours">
                <font>
@@ -23,32 +24,29 @@
             </Label>
             <TableView fx:id="coursesDisplay" layoutX="23.0" layoutY="60.0" prefHeight="320.0" prefWidth="300.0">
                <columns>
-                  <TableColumn prefWidth="150.0" text="Code" />
-                  <TableColumn prefWidth="150.0" text="Cours" />
+                  <TableColumn fx:id="colonneCode" prefWidth="150.0" text="Code" />
+                  <TableColumn fx:id="colonneCours" prefWidth="150.0" text="Cours" />
                </columns>
             </TableView>
          </children></Pane>
       <!-- Pane 2 : l'utilisateur peut choisir la session pour laquelle il peut voir les cours -->
-      <Pane layoutX="9.0" layoutY="409.0" prefHeight="84.0" prefWidth="327.0" style="-fx-background-color: #F0F4C3;">
+      <Pane layoutX="9.0" layoutY="409.0" prefHeight="84.0" prefWidth="327.0" style="-fx-background-color: #EEEEE4;">
          <children>
-            <MenuButton fx:id="coursLists" layoutX="14.0" layoutY="25.0" mnemonicParsing="false" onAction="#selection" prefHeight="34.0" prefWidth="156.0" styleClass="coursLists" text="Choix de Session">
+            <ChoiceBox fx:id="choixSession" layoutX="39.0" layoutY="29.0" prefHeight="27.0" prefWidth="125.0">
                <items>
-                  <MenuItem mnemonicParsing="false" text="Hiver" />
-                  <MenuItem mnemonicParsing="false" text="Automne" />
-                  <MenuItem mnemonicParsing="false" text="Ete" />
+                  <FXCollections fx:factory="observableArrayList">
+                     <String fx:value="Automne" />
+                     <String fx:value="Hiver" />
+                     <String fx:value="Ete" />
+                  </FXCollections>
                </items>
-               <font>
-                  <Font size="15.0" />
-               </font>
-            </MenuButton>
-            <Button fx:id="chargementButton" layoutX="220.0" layoutY="25.0" mnemonicParsing="false" onAction="#handleCharge" prefHeight="34.0" prefWidth="86.0" text="charger">
-               <font>
-                  <Font size="15.0" />
-               </font></Button>
+            </ChoiceBox>
+
+            <Button fx:id="chargementButton" layoutX="222.0" layoutY="29.0" mnemonicParsing="false" onAction="#handleCharge" prefHeight="26.0" prefWidth="73.0" text="charger" />
          </children>
       </Pane>
       <!-- Pane 3: Dans cette section, l'utilisateur peut procedé à son inscription -->
-      <Pane layoutX="361.0" layoutY="-1.0" prefHeight="500.0" prefWidth="345.0" style="-fx-background-color: #F0F4C3;">
+      <Pane layoutX="361.0" layoutY="-1.0" prefHeight="500.0" prefWidth="345.0" style="-fx-background-color: #EEEEE4;">
          <children>
             <Label layoutX="66.0" layoutY="19.0" prefHeight="39.0" prefWidth="241.0" text="Formulaire d'inscription">
                <font>
