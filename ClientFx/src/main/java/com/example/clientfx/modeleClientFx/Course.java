@@ -1,42 +1,45 @@
 package com.example.clientfx.modeleClientFx;
 
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+
 import java.io.Serializable;
 
 public class Course implements Serializable {
+    private final StringProperty name;
+    private final StringProperty code;
+    private final StringProperty session;
 
-    private String name;
-    private String code;
-    private String session;
 
     public Course(String name, String code, String session) {
-        this.name = name;
-        this.code = code;
-        this.session = session;
+        this.name = new SimpleStringProperty(name);
+        this.code =  new SimpleStringProperty(code);
+        this.session =  new SimpleStringProperty(session);
+
     }
 
     public String getName() {
-        return name;
+        return name.get();
     }
 
     public void setName(String name) {
-        this.name = name;
+        this.name.set(name);
     }
+    public StringProperty nameProperty() {return name;}
 
     public String getCode() {
-        return code;
+        return code.get();
     }
 
     public void setCode(String code) {
-        this.code = code;
+        this.code.set(code);
     }
+    public StringProperty codeProperty() {return code;}
 
-    public String getSession() {
-        return session;
-    }
+    public String getSession() {return session.get();}
 
-    public void setSession(String session) {
-        this.session = session;
-    }
+    public void setSession(String session) {this.session.set(session);}
+   public StringProperty sessionProperty() {return code;}
 
     @Override
     public String toString() {

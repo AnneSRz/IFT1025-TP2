@@ -11,6 +11,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.text.Font?>
+<?import javafx.scene.control.cell.PropertyValueFactory?>
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="700.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.clientfx.Client_fxController">
    <!-- Pane 1 : La où les cours filtrés seront affichés -->
@@ -24,8 +25,12 @@
             </Label>
             <TableView fx:id="coursesDisplay" layoutX="23.0" layoutY="60.0" prefHeight="320.0" prefWidth="300.0">
                <columns>
-                  <TableColumn fx:id="colonneCode" prefWidth="150.0" text="Code" />
-                  <TableColumn fx:id="colonneCours" prefWidth="150.0" text="Cours" />
+                  <TableColumn fx:id="colonneCode" prefWidth="150.0" text="Code" >
+                     <cellValueFactory><PropertyValueFactory property="code"></PropertyValueFactory></cellValueFactory>
+                  </TableColumn>
+                  <TableColumn fx:id="colonneNom" prefWidth="150.0" text="Cours">
+                     <cellValueFactory><PropertyValueFactory property="name"></PropertyValueFactory></cellValueFactory>
+                  </TableColumn>
                </columns>
             </TableView>
          </children></Pane>

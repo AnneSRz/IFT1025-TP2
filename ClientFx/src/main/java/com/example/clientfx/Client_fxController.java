@@ -1,33 +1,38 @@
 package com.example.clientfx;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import com.example.clientfx.modeleClientFx.Course;
 import com.example.clientfx.modeleClientFx.RegistrationForm;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.AnchorPane;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.URL;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
+//mport server.models.Course;
 
 public class Client_fxController implements Initializable {
     //<editor-fold desc="Attributs">
     @FXML
     private ChoiceBox choixSession;
-    private String session;
+    private String sessionVoulue;
     private ArrayList<Course> coursFiltres;
     private Course module1;
     private RegistrationForm module2;
     @FXML
     private TableView<Course> coursesDisplay;
+    @FXML
+    private TableColumn<Course, String> colonneCode;
+    @FXML
+    private TableColumn<Course, String> colonneNom;
+
     @FXML
     private MenuButton coursLists;
     @FXML
@@ -38,7 +43,6 @@ public class Client_fxController implements Initializable {
     private TextField emailField, matriculeField;
     //</editor-fold>
 
-
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
 
@@ -46,11 +50,11 @@ public class Client_fxController implements Initializable {
         try {
             Socket socket = new Socket("127.0.0.1",1337);
 
-            this.session = (String) this.choixSession.getSelectionModel().getSelectedItem();
-            if(session == null){
-                this.session = (String) this.choixSession.getSelectionModel().getSelectedItem();
+            this.sessionVoulue = (String) this.choixSession.getSelectionModel().getSelectedItem();
+            if(sessionVoulue == null){
+                this.sessionVoulue = (String) this.choixSession.getSelectionModel().getSelectedItem();
             }else{
-                this.session = (String) this.choixSession.getSelectionModel().getSelectedItem();
+                this.sessionVoulue = (String) this.choixSession.getSelectionModel().getSelectedItem();
                 handleCharge();
             }
             socket.close();
@@ -64,27 +68,31 @@ public class Client_fxController implements Initializable {
     public void handleCharge() {
         //Step 1 : Aller chercher la session choisie dans la liste déroulante.
         try {
-            this.session = (String) this.choixSession.getSelectionModel().getSelectedItem();
+            this.sessionVoulue = (String) this.choixSession.getSelectionModel().getSelectedItem();
 
             Socket socket = new Socket("127.0.0.1",1337);
             ObjectOutputStream objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
             ObjectInputStream objectInputStream = new ObjectInputStream(socket.getInputStream());
 
-            System.out.println(session);
+            System.out.println(sessionVoulue);
             System.out.println("Chargement des cours");
 
             //Step 2 : Envoie une requete charger au serveur "Avec la session choisie"
-            String requete = "CHARGER " + this.session;
+            String requete = "CHARGER " + this.sessionVoulue;
             objectOutputStream.writeObject(requete);
             objectOutputStream.flush();
+            objectOutputStream.reset();
             try{
                 //Step 3 : Le client recupere la liste des cours envoyes par le serveur"
-                this.coursFiltres = (ArrayList) objectInputStream.readObject() ;
+                this.coursFiltres = (ArrayList<Course>) objectInputStream.readObject() ;
 
                 //Step 4 : Affhiché la liste des cours dans le tableau
-                for (int i = 0; i < coursFiltres.size(); i++ ){
-                    System.out.println((i+1)+". " + coursFiltres.get(i).getCode() + " " + coursFiltres.get(i).getName());
-                }
+                ObservableList<Course> listeDesCours = FXCollections.observableArrayList(coursFiltres);
+                coursesDisplay.setItems(listeDesCours);
+
+                this.colonneCode.setCellValueFactory(new PropertyValueFactory<>("code"));
+                this.colonneNom.setCellValueFactory(new PropertyValueFactory<>("name"));
+
                 objectOutputStream.close();
                 objectInputStream.close();
             } catch (ClassNotFoundException e) {
@@ -150,8 +158,6 @@ public class Client_fxController implements Initializable {
 }
 
 
-
-// Ajouter les choix a la liste deroulante "choix de session"
 
 // Action pour envoyer
 
