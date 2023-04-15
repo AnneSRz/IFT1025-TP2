@@ -10,12 +10,12 @@ public class Client_simple {
     private int port;
     private ArrayList<Course> coursFiltres;
     public Client_simple(int port) throws IOException{
-        //Step 1 : Connecter le client au serveur
         this.port = port;
     }
 
     public void charger() {
         try {
+            //Step 1 : Connecter le client au serveur
             Socket socket = new Socket("127.0.0.1",this.port);
             ObjectOutputStream objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
             ObjectInputStream objectInputStream = new ObjectInputStream(socket.getInputStream());
@@ -33,14 +33,18 @@ public class Client_simple {
 
                 System.out.print("> Choix : ");
 
+                // Step 3 : Valider le choix du client pour la session qu'il veut consulter
                 Scanner scan = new Scanner(System.in);
                 if (scan.hasNextInt()) {
                     sessionChoisie = scan.nextInt();
+                    // Step 3.1 : Est-ce que l'entier est bien entre 1 et 3 inclusivement
                     if (sessionChoisie < 1 || sessionChoisie > 3 ) {
                         System.out.println("Choix de cours invalide");
                         System.out.println("Faites un autre choix");
                     }
                 } else {
+                    // Step 3.2 :  Afficher ce message si le client écrit sur la ligne de commande un caractere autre
+                    // qu'un entier par exemple
                     System.out.println("Choix de cours invalide");
                     System.out.println("Faites un autre choix entre 1 et 3");
                     scan.next();
@@ -50,24 +54,24 @@ public class Client_simple {
 
             System.out.println("les cours offerts pour la session d'" + session + " sont: ");
 
-            //Step 3 : Envoie une requete charger au serveur "Charger avec la session choisie"
+            //Step 4 : Envoie une requete charger au serveur "Charger avec la session choisie"
             String requete = "CHARGER " + session;
             objectOutputStream.writeObject(requete);
             objectOutputStream.flush();
 
-            //Step 4 : Le client recupere la liste des cours envoyes par le serveur"
+            //Step 5 : Le client recupere la liste des cours envoyes par le serveur"
             this.coursFiltres = (ArrayList<Course>) objectInputStream.readObject() ;
 
-            //Step 5 : Le client affiche ce qui est envoyé par le serveur soit la liste des cours triés
+            //Step 6 : Le client affiche ce qui est envoyé par le serveur soit la liste des cours triés
             for (int i = 0; i < coursFiltres.size(); i++ ){
                 System.out.println((i+1)+". " + coursFiltres.get(i).getCode() + " " + coursFiltres.get(i).getName());
             }
-
+            // Step 7 : Fermer les flux d'entrées et de sorties pour éviter les problèmes
             objectOutputStream.close();
             objectInputStream.close();
             socket.close();
 
-            // Step 6 : Proceder a la partie de l'inscription
+            // Step 8 : Proceder a la partie de l'inscription
             inscription();
 
         }catch (IOException ex) {
@@ -88,12 +92,14 @@ public class Client_simple {
         String code = "";
         RegistrationForm coursInscrit = null;
         try{
+            // Step 1 : Se reconnecter au serveur
             Socket socket = new Socket("127.0.0.1",this.port);
             ObjectOutputStream objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
             ObjectInputStream objectInputStream = new ObjectInputStream(socket.getInputStream());
             BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-            // Step 1 : Changer de cours ou Inscription
+            // Step 2 : Permettre au client de changer de cours ou de choisir de s'inscrire s'il est satisfait des choix
+            // dispos pour la session qui est affichée
             while (optionVoulue < 1 || optionVoulue > 2) {
                 System.out.println("> Choix : ");
                 System.out.println("1. Consulter les cours offerts pour une autre session");
@@ -101,6 +107,10 @@ public class Client_simple {
 
                 System.out.print("> Choix : ");
                 Scanner scanner = new Scanner(System.in);
+
+                // Step 2.1 : Tant que le client n'a pas fait un choix valide entre 1 et 2 lui proposer les options
+                // précédentes
+
                 if (scanner.hasNextInt()) {
                     optionVoulue = scanner.nextInt();
                     if (optionVoulue < 1 || optionVoulue > 2) {
@@ -115,7 +125,7 @@ public class Client_simple {
             }
             switch (optionVoulue) {
                 case 1 -> {
-                    // Step 2 : Permettre a l'utilisateur de faire un autre choix
+                    // Step 2 : Permettre a l'utilisateur de chosir une autre session
                     socket.close();
                     objectOutputStream.close();
                     objectInputStream.close();

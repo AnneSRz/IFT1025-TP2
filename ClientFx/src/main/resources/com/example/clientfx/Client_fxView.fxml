@@ -8,10 +8,11 @@
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.cell.PropertyValueFactory?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.text.Font?>
-<?import javafx.scene.control.cell.PropertyValueFactory?>
+<?import javafx.event.EventHandler?>
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="700.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.clientfx.Client_fxController">
    <!-- Pane 1 : La où les cours filtrés seront affichés -->
@@ -25,13 +26,19 @@
             </Label>
             <TableView fx:id="coursesDisplay" layoutX="23.0" layoutY="60.0" prefHeight="320.0" prefWidth="300.0">
                <columns>
-                  <TableColumn fx:id="colonneCode" prefWidth="150.0" text="Code" >
-                     <cellValueFactory><PropertyValueFactory property="code"></PropertyValueFactory></cellValueFactory>
+                  <TableColumn fx:id="colonneCode" prefWidth="150.0" text="Code">
+                     <cellValueFactory><PropertyValueFactory property="code" /></cellValueFactory>
                   </TableColumn>
                   <TableColumn fx:id="colonneNom" prefWidth="150.0" text="Cours">
-                     <cellValueFactory><PropertyValueFactory property="name"></PropertyValueFactory></cellValueFactory>
+                     <cellValueFactory><PropertyValueFactory property="name" /></cellValueFactory>
                   </TableColumn>
                </columns>
+               <onMouseClicked>
+                  <EventHandler>
+                     <Event source="coursesDisplay" eventType="javafx.scene.input.MouseEvent" />
+                     <Script><![CDATA[selection();]]></Script>
+                  </EventHandler>
+               </onMouseClicked>
             </TableView>
          </children></Pane>
       <!-- Pane 2 : l'utilisateur peut choisir la session pour laquelle il peut voir les cours -->
@@ -58,7 +65,7 @@
                   <Font size="24.0" />
                </font>
             </Label>
-            <TextField fx:id="prenomFiled" layoutX="155.0" layoutY="89.0" styleClass="prenomFiled">
+            <TextField fx:id="prenomField" layoutX="155.0" layoutY="89.0" styleClass="prenomField">
                <font>
                   <Font size="14.0" />
                </font>
@@ -98,7 +105,7 @@
                   <Font size="15.0" />
                </font>
             </Label>
-            <Label fx:id="emailError" layoutX="216.0" layoutY="198.0" styleClass="emailError" text="email invalide" textFill="#ee0606">
+            <Label fx:id="emailError" layoutX="216.0" layoutY="198.0" styleClass="emailError" text="email invalide" textFill="#eeeee4">
                <font>
                   <Font size="10.0" />
                </font>
@@ -108,7 +115,7 @@
                   <Font size="15.0" />
                </font>
             </Button>
-            <Label fx:id="matriculeError" layoutX="211.0" layoutY="238.0" styleClass="matriculeError" text="matricule invalide" textFill="#ee0606">
+            <Label fx:id="matriculeError" layoutX="211.0" layoutY="238.0" styleClass="matriculeError" text="matricule invalide" textFill="#eeeee4">
                <font>
                   <Font size="10.0" />
                </font>
