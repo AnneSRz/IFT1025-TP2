@@ -9,6 +9,9 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.AnchorPane;
+import javafx.stage.Window;
+
 import java.io.*;
 import java.net.Socket;
 import java.net.URL;
@@ -17,6 +20,8 @@ import java.util.ArrayList;
 import java.util.ResourceBundle;
 
 public class Client_fxController implements Initializable {
+    @FXML
+    private AnchorPane pane;
     //<editor-fold desc="Attributs">
     @FXML
     private ChoiceBox choixSession;
@@ -34,8 +39,7 @@ public class Client_fxController implements Initializable {
     private Button registrer;
     @FXML
     private Label emailError, matriculeError;
-    @FXML
-    //private TextField emailField, matriculeField;
+
     //</editor-fold>
 
     @Override
@@ -114,10 +118,63 @@ public class Client_fxController implements Initializable {
         }
     }
     //public void selection(ActionEvent actionEvent)
-    public void selection() {
-    }
 
     @FXML
+    public void handle(ActionEvent actionEvent) {
+        if(prenomField.getText().isEmpty() && nomField.getText().isEmpty() && emailField.getText().isEmpty() &
+                matriculeField.getText().isEmpty()) {
+            showAlert(Alert.AlertType.ERROR, pane.getScene().getWindow(),
+                    "Le formulaire est invalide. Assurez-vous que tous les champs" +
+                            " sont remplis");
+            return;
+        }if(prenomField.getText().isEmpty()) {
+            showAlert(Alert.AlertType.ERROR, pane.getScene().getWindow(),
+                    "Entrez votre nom");
+            return;
+        }if(nomField.getText().isEmpty()) {
+            showAlert(Alert.AlertType.ERROR, pane.getScene().getWindow(),
+                    "Entrez votre nom");
+            return;
+        }
+        if(emailField.getText().isEmpty()) {
+            showAlert(Alert.AlertType.ERROR, pane.getScene().getWindow(),
+                    "Entrez votre email");
+            return;
+        }
+        if(matriculeField.getText().isEmpty()) {
+            showAlert(Alert.AlertType.ERROR, pane.getScene().getWindow(),
+                    "Entrez votre matricule");
+            return;
+        }if(!emailValidation(emailField.getText()) || !matriculeValidation(matriculeField.getText())) {
+            //boolean emailEstValide = validEmail(emailField, emailError, "Invalide, s'il vous plait réessayer");
+           // boolean matriculeEstValide = validmatricule(matriculeField, matriculeError, "Invalide, s'il vous plait réessayer");
+            emailError.setText("Email invalide");
+            emailError.setStyle("-fx-text-fill: red");
+            matriculeError.setText("Matricule invalide");
+            matriculeError.setStyle("-fx-text-fill: red");
+            showAlert(Alert.AlertType.ERROR, pane.getScene().getWindow(),
+                    "Le champ email est invalide" + "\n" + "Le champ matricule est invalide");
+            }else {
+                emailError.setText("Email valide");
+                emailError.setStyle("-fx-text-fill: green");
+                matriculeError.setText("Matricule valide");
+                matriculeError.setStyle("-fx-text-fill: green");
+
+                showAlert(Alert.AlertType.CONFIRMATION, pane.getScene().getWindow(), "Ici le msg du serveur" );
+            }
+
+    }
+
+    private void showAlert(Alert.AlertType error, Window window, String Message) {
+        Alert messageAlert = new Alert(error);
+        String messageErreur = "Message";
+        messageAlert.setTitle(messageErreur);
+        messageAlert.setContentText(Message);
+        messageAlert.initOwner(window);
+        messageAlert.show();
+    }
+
+
     public void handleRegistration() {
         try {
             // Step 1 : Se reconnecter au serveur
@@ -139,44 +196,37 @@ public class Client_fxController implements Initializable {
                 System.out.println(code);
                 System.out.println(cours);
 
-                registrer.setOnAction(e -> {
-                    if (prenomField.getText().isEmpty() && nomField.getText().isEmpty() && emailField.getText().isEmpty()
-                            && matriculeField.getText().isBlank()) {
-                        System.out.println("Veuillez vous assurer d'avoir complete tous les champs");
-                    } else {
-                        String prenom = String.valueOf(prenomField.getText());
-                        String nom = String.valueOf(nomField.getText());
-                        String email = String.valueOf(emailField.getText());
-                        String matricule = String.valueOf(matriculeField.getText());
-                        try {
 
-                            RegistrationForm coursInscrit = new RegistrationForm(prenom, nom, email, matricule, coursSelectionne);
-                            System.out.println(leCours);
-                            // Step 5 : Envoyer une requete Inscription au server
-                            String requeteInscription = "INSCRIRE";
-                            objectOutputStream.writeObject(requeteInscription);
-                            objectOutputStream.flush(); // jusqu'a la ça marche la requete est envoyé
+                String prenom = String.valueOf(prenomField.getText());
+                String nom = String.valueOf(nomField.getText());
+                String email = String.valueOf(emailField.getText());
+                String matricule = String.valueOf(matriculeField.getText());
+                try {
 
-                            //Step 6 : Envoyer l'objet Registrationform au serveur
-                            objectOutputStream.writeObject(coursInscrit);
-                            objectOutputStream.flush();
+                    RegistrationForm coursInscrit = new RegistrationForm(prenom, nom, email, matricule, coursSelectionne);
+                    System.out.println(leCours);
+                    // Step 5 : Envoyer une requete Inscription au server
+                    String requeteInscription = "INSCRIRE";
+                    objectOutputStream.writeObject(requeteInscription);
+                    objectOutputStream.flush(); // jusqu'a la ça marche la requete est envoyé
 
-                            // Step 7 : Lire le message de confirmation du serveur.
-                            Object msgConfirmation = objectInputStream.readObject();
-                            String confirmation = (String) msgConfirmation;
-                            System.out.println(confirmation);
-                        } catch (IOException ex) {
-                            ex.printStackTrace();
-                            System.out.println("Une erreur s'est produite lors de l'envoie des données d'inscription");
-                        } catch (ClassNotFoundException ex) {
-                            throw new RuntimeException(ex);
-                        }
+                    //Step 6 : Envoyer l'objet Registrationform au serveur
+                    objectOutputStream.writeObject(coursInscrit);
+                    objectOutputStream.flush();
 
-                    }
+                    // Step 7 : Lire le message de confirmation du serveur.
+                    Object msgConfirmation = objectInputStream.readObject();
+                    String confirmation = (String) msgConfirmation;
+                    System.out.println(confirmation);
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                    System.out.println("Une erreur s'est produite lors de l'envoie des données d'inscription");
+                } catch (ClassNotFoundException ex) {
+                    throw new RuntimeException(ex);
+                }
+            }
                     System.out.println("le bouton est clique");
 
-                });
-            }
 
             //ne pas oublier de traiter les exceptions si le fichiers de registration est mal formates.
         } catch (UnknownHostException ex) {
@@ -185,26 +235,13 @@ public class Client_fxController implements Initializable {
             throw new RuntimeException(e);
         }
     }
-}
-
-// Step : Validder que l'email et le matricule  sont conformes avant d'envoyer le formulaire
-    /*
-    boolean emailEstValide = validEmail(emailField, emailError, "Invalide, s'il vous plait réessayer");
-    boolean matriculeEstValide = validmatricule(matriculeField, matriculeError, "Invalide, s'il vous plait réessayer");
-    if (emailEstValide && matriculeEstValide) {
-        emailError.setText("Email Valide");
-        matriculeError.setText("Matricule Valide");
-    }
-    // Step : S'assurer que le matricule respecte le format avant d'envoyer le formulaire
-
-    System.out.println("Envoi des données du formulaire");
 
 
     // Step : Valider le Email
     private static boolean emailValidation (String text1){
         return text1.matches("^[\\w!#$%&'*+/=?`{|}~^.-]+(?:\\.[\\w!#$%&'*+/=?`{|}~^.-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$");
     }
-
+//ne serait pas necessaire
     private static boolean validEmail (TextField textField1, Label error, String msgErreur){
         boolean mail = emailValidation(textField1.getText());
         if (!mail) {
@@ -221,6 +258,7 @@ public class Client_fxController implements Initializable {
     private static boolean matriculeValidation (String text2){
         return text2.matches("^[0-9]{8}$");
     }
+    //ne serait pas necessaire
     private static boolean validmatricule (TextField textField2, Label erreur, String erreurMsg){
         boolean matricule = matriculeValidation(textField2.getText());
         textField2.getStyleClass().remove("invalide");
@@ -233,36 +271,13 @@ public class Client_fxController implements Initializable {
         return matricule;
     }
 }
+/*
+ boolean emailEstValide = validEmail(emailField, emailError, "Invalide, s'il vous plait réessayer");
+            boolean matriculeEstValide = validmatricule(matriculeField, matriculeError, "Invalide, s'il vous plait réessayer");
+            if (emailEstValide && matriculeEstValide) {
+                emailError.setText("Email Valide");
+                emailError.setStyle("-fx-text-fill: red");
+                matriculeError.setText("Matricule Valide");
+                matriculeError.setStyle("-fx-text-fill: red");
+*/
 
-     */
-
-
-
-
-// Action pour envoyer
-
-    /*
-    submitButton.setOnAction(new EventHandler<ActionEvent>() {
-        @Override
-        public void handle(ActionEvent event) {
-            if(nameField.getText().isEmpty()) {
-                showAlert(Alert.AlertType.ERROR, gridPane.getScene().getWindow(),
-                        "Form Error!", "Please enter your name");
-                return;
-            }
-            if(emailField.getText().isEmpty()) {
-                showAlert(Alert.AlertType.ERROR, gridPane.getScene().getWindow(),
-                        "Form Error!", "Please enter your email id");
-                return;
-            }
-            if(passwordField.getText().isEmpty()) {
-                showAlert(Alert.AlertType.ERROR, gridPane.getScene().getWindow(),
-                        "Form Error!", "Please enter a password");
-                return;
-            }
-
-            showAlert(Alert.AlertType.CONFIRMATION, gridPane.getScene().getWindow(),
-                    "Registration Successful!", "Welcome " + nameField.getText());
-        }
-    });
-     */
