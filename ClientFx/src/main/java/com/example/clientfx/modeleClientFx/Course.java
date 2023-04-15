@@ -39,7 +39,7 @@ public class Course implements Serializable {
     public String getSession() {return session.get();}
 
     public void setSession(String session) {this.session.set(session);}
-   public StringProperty sessionProperty() {return code;}
+   public StringProperty sessionProperty() {return session;}
 
     @Override
     public String toString() {

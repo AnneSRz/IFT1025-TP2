@@ -64,45 +64,53 @@ public class Client_fxController implements Initializable {
     public void handleCharge() {
         // Step 1 : Aller chercher la session choisie dans la liste déroulante.
         try {
-            this.sessionVoulue = (String) this.choixSession.getSelectionModel().getSelectedItem();
-
+            // Step 1 : Se connecter au serveur
             Socket socket = new Socket("127.0.0.1", 1337);
             ObjectOutputStream objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
             ObjectInputStream objectInputStream = new ObjectInputStream(socket.getInputStream());
 
-            System.out.println(this.sessionVoulue);
-            System.out.println("Chargement des cours");
+            // Step 2 : Aller chercher la session choisie dans la liste déroulante.
+            this.sessionVoulue = (String) this.choixSession.getSelectionModel().getSelectedItem();
+            if (sessionVoulue == null) {
+                this.sessionVoulue = (String) this.choixSession.getSelectionModel().getSelectedItem();
 
-            // Step 2 : Envoie une requete charger au serveur "Avec la session choisie"
-            String requete = "CHARGER " + this.sessionVoulue;
-            objectOutputStream.writeObject(requete);
-            objectOutputStream.flush();
-            objectOutputStream.reset();
-            try {
-                // Step 3 : Le client recupere la liste des cours envoyes par le serveur"
-                this.coursFiltres = (ArrayList<Course>) objectInputStream.readObject();
+            } else {
 
-                // Step 4 : Affhiché la liste des cours dans le tableau
-                ObservableList<Course> listeDesCours = FXCollections.observableArrayList(this.coursFiltres);
-                this.coursesDisplay.setItems(listeDesCours);
+                // Step 2 : Envoie une requete charger au serveur "Avec la session choisie"
+                String requete = "CHARGER " + this.sessionVoulue;
+                objectOutputStream.writeObject(requete);
+                objectOutputStream.flush();
+                objectOutputStream.reset();
+                try {
+                    // Step 3 : Le client recupere la liste des cours envoyes par le serveur"
+                    this.coursFiltres = (ArrayList<Course>) objectInputStream.readObject();
 
-                this.colonneCode.setCellValueFactory(new PropertyValueFactory<>("code"));
-                this.colonneNom.setCellValueFactory(new PropertyValueFactory<>("name"));
+                    // Step 4 : Affhiché la liste des cours dans le tableau
+                    ObservableList<Course> listeDesCours = FXCollections.observableArrayList(this.coursFiltres);
+                    this.coursesDisplay.setItems(listeDesCours);
 
-                // Step 5 : Fermer le flux d'entrée et de sortie
-                objectOutputStream.close();
-                objectInputStream.close();
-                socket.close();
+                    this.colonneCode.setCellValueFactory(new PropertyValueFactory<>("code"));
+                    this.colonneNom.setCellValueFactory(new PropertyValueFactory<>("name"));
 
-                // Step 5 : Procéder à la partie de l'inscription
-                handleRegistration();
+                    // Step 5 : Fermer le flux d'entrée et de sortie
+                    objectOutputStream.close();
+                    objectInputStream.close();
+                    socket.close();
 
-            } catch (ClassNotFoundException e) {
-                System.out.print("Erreur lors du chargement la liste de cours n'a pas pu être affiché");
-                throw new RuntimeException(e);
+                    // Step 5 : Procéder à la partie de l'inscription
+                    handleRegistration();
+
+                } catch (ClassNotFoundException e) {
+                    System.out.print("Erreur lors du chargement la liste de cours n'a pas pu être affiché");
+                    throw new RuntimeException(e);
+                } catch (IOException ex) {
+                    System.out.println("Erreur lors de l'envoie de la requête");
+                }
             }
+        } catch (UnknownHostException e) {
+            throw new RuntimeException(e);
         } catch (IOException e) {
-            System.out.println("Erreur lors de l'envoie de la requête");
+            throw new RuntimeException(e);
         }
     }
     //public void selection(ActionEvent actionEvent)
