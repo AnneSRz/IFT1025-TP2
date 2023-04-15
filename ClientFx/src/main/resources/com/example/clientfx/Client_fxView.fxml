@@ -33,12 +33,6 @@
                      <cellValueFactory><PropertyValueFactory property="name" /></cellValueFactory>
                   </TableColumn>
                </columns>
-               <onMouseClicked>
-                  <EventHandler>
-                     <Event source="coursesDisplay" eventType="javafx.scene.input.MouseEvent" />
-                     <Script><![CDATA[selection();]]></Script>
-                  </EventHandler>
-               </onMouseClicked>
             </TableView>
          </children></Pane>
       <!-- Pane 2 : l'utilisateur peut choisir la session pour laquelle il peut voir les cours -->

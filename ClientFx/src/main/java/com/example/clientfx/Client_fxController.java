@@ -107,14 +107,10 @@ public class Client_fxController implements Initializable {
     }
     //public void selection(ActionEvent actionEvent)
     public void selection() {
-        ObservableList<Course> leCours = this.coursesDisplay.getSelectionModel().getSelectedItems();
-        for(Course coursSelectionne : leCours) {
-            handleRegistration(coursSelectionne);
-        }
     }
 
     @FXML
-    public void handleRegistration(Course course) {
+    public void handleRegistration() {
         try {
             // Step 1 : Se reconnecter au serveur
             Socket socket = new Socket("127.0.0.1", 1337);
@@ -146,7 +142,7 @@ public class Client_fxController implements Initializable {
                         String matricule = String.valueOf(matriculeField.getText());
                         try {
 
-                            RegistrationForm coursInscrit = new RegistrationForm(prenom, nom, email, matricule, leCours);
+                            RegistrationForm coursInscrit = new RegistrationForm(prenom, nom, email, matricule, coursSelectionne);
                             System.out.println(leCours);
                             // Step 5 : Envoyer une requete Inscription au server
                             String requeteInscription = "INSCRIRE";
@@ -183,7 +179,7 @@ public class Client_fxController implements Initializable {
     }
 }
 
-    // Step : Validder que l'email et le matricule  sont conformes avant d'envoyer le formulaire
+// Step : Validder que l'email et le matricule  sont conformes avant d'envoyer le formulaire
     /*
     boolean emailEstValide = validEmail(emailField, emailError, "Invalide, s'il vous plait réessayer");
     boolean matriculeEstValide = validmatricule(matriculeField, matriculeError, "Invalide, s'il vous plait réessayer");
