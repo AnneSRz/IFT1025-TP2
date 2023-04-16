@@ -41,8 +41,6 @@ public class Client_fxController implements Initializable {
     @FXML
     private ObservableList<Course> leCours;
     private Course coursSelectionne;
-
-
     //</editor-fold>
 
     @Override
