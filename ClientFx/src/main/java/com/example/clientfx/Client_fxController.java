@@ -1,5 +1,4 @@
 package com.example.clientfx;
-
 import com.example.clientfx.modeleClientFx.RegistrationForm;
 import com.example.clientfx.modeleClientFx.Course;
 import javafx.collections.FXCollections;
