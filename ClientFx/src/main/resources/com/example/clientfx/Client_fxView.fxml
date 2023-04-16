@@ -23,7 +23,7 @@
                   <Font size="24.0" />
                </font>
             </Label>
-            <TableView fx:id="coursesDisplay" layoutX="23.0" layoutY="60.0" prefHeight="320.0" prefWidth="300.0">
+            <TableView fx:id="coursesDisplay" layoutX="23.0" layoutY="60.0" onMouseClicked="#selection" prefHeight="320.0" prefWidth="300.0">
                <columns>
                   <TableColumn fx:id="colonneCode" prefWidth="150.0" text="Code">
                      <cellValueFactory><PropertyValueFactory property="code" /></cellValueFactory>
