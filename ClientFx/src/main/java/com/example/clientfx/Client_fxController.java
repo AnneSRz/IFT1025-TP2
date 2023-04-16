@@ -9,10 +9,8 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Window;
-
 import java.io.*;
 import java.net.Socket;
 import java.net.URL;
@@ -21,9 +19,9 @@ import java.util.ArrayList;
 import java.util.ResourceBundle;
 
 public class Client_fxController implements Initializable {
+    //<editor-fold desc="Attributs">
     @FXML
     private AnchorPane pane;
-    //<editor-fold desc="Attributs">
     @FXML
     private ChoiceBox choixSession;
     private String sessionVoulue;
@@ -39,9 +37,8 @@ public class Client_fxController implements Initializable {
     @FXML
     private Label emailError, matriculeError;
     @FXML
-    private Button registrer, chargementButton;
+    private Button registrer;
     private ObservableList<Course> leCours;
-
 
     //</editor-fold>
 
@@ -69,7 +66,6 @@ public class Client_fxController implements Initializable {
 
     @FXML
     public void handleCharge() {
-        // Step 1 : Aller chercher la session choisie dans la liste déroulante.
         try {
             // Step 1 : Se connecter au serveur
             Socket socket = new Socket("127.0.0.1", 1337);
@@ -79,6 +75,7 @@ public class Client_fxController implements Initializable {
             // Step 2 : Aller chercher la session choisie dans la liste déroulante.
             this.sessionVoulue = (String) this.choixSession.getSelectionModel().getSelectedItem();
             if (sessionVoulue == null) {
+                showAlert(Alert.AlertType.ERROR, pane.getScene().getWindow(), "S'il vous plaît, choissisez une session");
                 this.sessionVoulue = (String) this.choixSession.getSelectionModel().getSelectedItem();
 
             } else {
@@ -121,60 +118,98 @@ public class Client_fxController implements Initializable {
             throw new RuntimeException(e);
         }
     }
-    //public void selection(ActionEvent actionEvent)
+
+    // Step : Valider le Email
+    private static boolean emailValidation(String text1) {
+        return text1.matches("^[\\w!#$%&'*+/=?`{|}~^.-]+(?:\\.[\\w!#$%&'*+/=?`{|}~^.-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$");
+    }
+
+    // Step : Valider le matricule
+    private static boolean matriculeValidation(String text2) {
+        return text2.matches("^[0-9]{8}$");
+    }
 
     @FXML
     public void handle(ActionEvent actionEvent) {
+        this.leCours = this.coursesDisplay.getSelectionModel().getSelectedItems();
+        System.out.println(this.leCours);
+        if(this.leCours.isEmpty()){
+            showAlert(Alert.AlertType.ERROR, pane.getScene().getWindow(),
+                    "Le formulaire est invalide" + "\n" + "Vous devez sélectionner un cours");
+        }
         if (prenomField.getText().isEmpty() && nomField.getText().isEmpty() && emailField.getText().isEmpty() &
                 matriculeField.getText().isEmpty()) {
             showAlert(Alert.AlertType.ERROR, pane.getScene().getWindow(),
-                    "Le formulaire est invalide. Assurez-vous que tous les champs" +
-                            " sont remplis");
-
+                    "Le formulaire est invalide" +"\n" +" Assurez-vous que tous les champs sont remplis");
             return;
         }
+
         if (prenomField.getText().isEmpty()) {
-            showAlert(Alert.AlertType.ERROR, pane.getScene().getWindow(),
-                    "Entrez votre nom");
+            showAlert(Alert.AlertType.ERROR, pane.getScene().getWindow(), "Entrez votre prenom");
 
             return;
         }
         if (nomField.getText().isEmpty()) {
-            showAlert(Alert.AlertType.ERROR, pane.getScene().getWindow(),
-                    "Entrez votre nom");
+            showAlert(Alert.AlertType.ERROR, pane.getScene().getWindow(), "Entrez votre nom");
             return;
         }
         if (emailField.getText().isEmpty()) {
-            showAlert(Alert.AlertType.ERROR, pane.getScene().getWindow(),
-                    "Entrez votre email");
+            showAlert(Alert.AlertType.ERROR, pane.getScene().getWindow(), "Entrez votre email");
 
             return;
         }
         if (matriculeField.getText().isEmpty()) {
-            showAlert(Alert.AlertType.ERROR, pane.getScene().getWindow(),
-                    "Entrez votre matricule");
+            showAlert(Alert.AlertType.ERROR, pane.getScene().getWindow(), "Entrez votre matricule");
 
             return;
         }
-        if (!emailValidation(emailField.getText()) || !matriculeValidation(matriculeField.getText())) {
-            //boolean emailEstValide = validEmail(emailField, emailError, "Invalide, s'il vous plait réessayer");
-            // boolean matriculeEstValide = validmatricule(matriculeField, matriculeError, "Invalide, s'il vous plait réessayer");
+        if(!emailValidation(emailField.getText()) && matriculeValidation(matriculeField.getText())){
             emailError.setText("Email invalide");
-            emailError.setStyle("-fx-text-fill: red");
+            emailError.setStyle("-fx-text-fill: red" );
+            emailField.setStyle("-fx-border-color:red ; -fx-border-width: 0.5px");
+
+            matriculeError.setText("Matricule valide");
+            matriculeError.setStyle("-fx-text-fill: green");
+            matriculeField.setStyle("-fx-border-color: transparent");
+            showAlert(Alert.AlertType.ERROR, pane.getScene().getWindow(),
+                    "Le formulaire est invalide" + "\n" +"Le champ email est invalide");
+            return;
+        }
+        if(!matriculeValidation(matriculeField.getText()) && emailValidation(emailField.getText())){
             matriculeError.setText("Matricule invalide");
             matriculeError.setStyle("-fx-text-fill: red");
+            matriculeField.setStyle("-fx-border-color:red ; -fx-border-width: 0.5px");
+
+            emailError.setText("Email valide");
+            emailError.setStyle("-fx-text-fill: green");
+            emailField.setStyle("-fx-border-color: transparent");
+
             showAlert(Alert.AlertType.ERROR, pane.getScene().getWindow(),
-                    "Le champ email est invalide" + "\n" + "Le champ matricule est invalide");
+                    "Le formulaire est invalide"  + "\n" + "Le champ matricule est invalide");
+            return;
+        }
+        if (!emailValidation(emailField.getText()) && !matriculeValidation(matriculeField.getText())) {
+            emailError.setText("Email invalide");
+            emailError.setStyle("-fx-text-fill: red" );
+            emailField.setStyle("-fx-border-color:red ; -fx-border-width: 0.5px");
+
+            matriculeError.setText("Matricule invalide");
+            matriculeError.setStyle("-fx-text-fill: red");
+            matriculeField.setStyle("-fx-border-color:red ; -fx-border-width: 0.5px");
+            showAlert(Alert.AlertType.ERROR, pane.getScene().getWindow(),
+                    "Le formulaire est invalide" + "\n" +"Le champ email est invalide" + "\n" +
+                            "Le champ matricule est invalide");
 
         } else {
             emailError.setText("Email valide");
             emailError.setStyle("-fx-text-fill: green");
+            emailField.setStyle("-fx-border-color: transparent");
+
             matriculeError.setText("Matricule valide");
             matriculeError.setStyle("-fx-text-fill: green");
+            matriculeField.setStyle("-fx-border-color: transparent");
 
             handleRegistration();
-
-            //this.registrer.setOnMouseClicked(this::selection);
 
         }
     }
@@ -187,19 +222,6 @@ public class Client_fxController implements Initializable {
         messageAlert.initOwner(window);
         messageAlert.show();
     }
-    @FXML
-    public void selection(MouseEvent mouseEvent) {
-        this.leCours = this.coursesDisplay.getSelectionModel().getSelectedItems();
-        System.out.println(leCours);
-        if(this.leCours.isEmpty()){
-            showAlert(Alert.AlertType.ERROR, pane.getScene().getWindow(),
-                    "S'il vous plait, veuillez sélectionner un cours");
-        }else{
-            this.registrer.setOnAction(this::handle);
-
-        }
-    }
-
 
     public void handleRegistration() {
         try {
@@ -208,69 +230,46 @@ public class Client_fxController implements Initializable {
             ObjectOutputStream objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
             ObjectInputStream objectInputStream = new ObjectInputStream(socket.getInputStream());
 
-            // Step 2: Extraire les informations du tableaux
-            ObservableList<Course> leCours = this.coursesDisplay.getSelectionModel().getSelectedItems();
+            // Step 2: Extraire les informations du tableaix (Observable ArrayList)
+           Course coursSelectionne = new Course(coursesDisplay.getSelectionModel().getSelectedItem().getName(),
+            coursesDisplay.getSelectionModel().getSelectedItem().getCode(),
+            coursesDisplay.getSelectionModel().getSelectedItem().getSession());
+           System.out.println(coursSelectionne);
 
-            //ObservableList<Course> listeCours = FXCollections.observableArrayList(this.coursFiltres);
+            String prenom = String.valueOf(prenomField.getText());
+            String nom = String.valueOf(nomField.getText());
+            String email = String.valueOf(emailField.getText());
+            String matricule = String.valueOf(matriculeField.getText());
 
-            for (Course coursSelectionne : leCours) {
-                Course coursInscrit = new Course(coursSelectionne.getName(), coursSelectionne.getCode(), coursSelectionne.getSession());
-                String code = coursInscrit.getCode();
-                String cours = coursInscrit.getName();
-                String session = coursInscrit.getSession();
+            try {
+                RegistrationForm donneesInscription = new RegistrationForm(prenom, nom, email, matricule, coursSelectionne);
+                System.out.print(donneesInscription);
+                //System.out.println(donneesInscription);
+                // Step 5 : Envoyer une requete Inscription au server
+                String requeteInscription = "INSCRIRE";
+                objectOutputStream.writeObject(requeteInscription);
+                objectOutputStream.flush(); // jusqu'a la ça marche la requete est envoyé
 
-                System.out.println(code);
-                System.out.println(cours);
-                System.out.println(session);
+                //Step 6 : Envoyer l'objet Registrationform au serveur
+                objectOutputStream.writeObject(donneesInscription);
+                objectOutputStream.flush();
 
-
-                String prenom = this.prenomField.getText();
-                String nom = this.nomField.getText();
-                String email = this.emailField.getText();
-                String matricule = String.valueOf(matriculeField.getText());
-
-                try {
-                    RegistrationForm donneesInscription = new RegistrationForm(prenom, nom, email, matricule, coursSelectionne);
-                    System.out.println(leCours);
-                    // Step 5 : Envoyer une requete Inscription au server
-                    String requeteInscription = "INSCRIRE";
-                    objectOutputStream.writeObject(requeteInscription);
-                    objectOutputStream.flush(); // jusqu'a la ça marche la requete est envoyé
-
-                    //Step 6 : Envoyer l'objet Registrationform au serveur
-                    objectOutputStream.writeObject(donneesInscription);
-                    objectOutputStream.flush();
-
-                    // Step 7 : Lire le message de confirmation du serveur.
-                    Object msgConfirmation = objectInputStream.readObject();
-                    String confirmation = (String) msgConfirmation;
-                    showAlert(Alert.AlertType.ERROR, pane.getScene().getWindow(), confirmation);
-                    System.out.println(confirmation);
-                } catch (IOException ex) {
-                    ex.printStackTrace();
-                    System.out.println("Une erreur s'est produite lors de l'envoie des données d'inscription");
-                } catch (ClassNotFoundException ex) {
-                    throw new RuntimeException(ex);
-                }
+                // Step 7 : Lire le message de confirmation du serveur.
+                Object msgConfirmation = objectInputStream.readObject();
+                String confirmation = (String) msgConfirmation;
+                showAlert(Alert.AlertType.ERROR, pane.getScene().getWindow(), confirmation);
+                System.out.println(confirmation);
+            } catch (IOException ex) {
+                ex.printStackTrace();
+                System.out.println("Une erreur s'est produite lors de l'envoie des données d'inscription");
+            } catch (ClassNotFoundException ex) {
+                throw new RuntimeException(ex);
             }
 
-            //ne pas oublier de traiter les exceptions si le fichiers de registration est mal formates.
         } catch (UnknownHostException ex) {
             throw new RuntimeException(ex);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
-
-
-    // Step : Valider le Email
-    private static boolean emailValidation(String text1) {
-        return text1.matches("^[\\w!#$%&'*+/=?`{|}~^.-]+(?:\\.[\\w!#$%&'*+/=?`{|}~^.-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$");
-    }
-
-    // Step : Valider le matricule
-    private static boolean matriculeValidation(String text2) {
-        return text2.matches("^[0-9]{8}$");
-    }
 }
-
