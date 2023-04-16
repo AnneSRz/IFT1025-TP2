@@ -38,7 +38,10 @@ public class Client_fxController implements Initializable {
     private Label emailError, matriculeError;
     @FXML
     private Button registrer;
+    @FXML
     private ObservableList<Course> leCours;
+    private Course coursSelectionne;
+
 
     //</editor-fold>
 
@@ -79,13 +82,13 @@ public class Client_fxController implements Initializable {
                 this.sessionVoulue = (String) this.choixSession.getSelectionModel().getSelectedItem();
 
             } else {
-
-                // Step 2 : Envoie une requete charger au serveur "Avec la session choisie"
-                String requete = "CHARGER " + this.sessionVoulue;
-                objectOutputStream.writeObject(requete);
-                objectOutputStream.flush();
-                objectOutputStream.reset();
                 try {
+                    // Step 2 : Envoie une requete charger au serveur "Avec la session choisie"
+                    String requete = "CHARGER " + this.sessionVoulue;
+                    objectOutputStream.writeObject(requete);
+                    objectOutputStream.flush();
+                    objectOutputStream.reset();
+
                     // Step 3 : Le client recupere la liste des cours envoyes par le serveur"
                     this.coursFiltres = (ArrayList<Course>) objectInputStream.readObject();
 
@@ -113,8 +116,10 @@ public class Client_fxController implements Initializable {
                 }
             }
         } catch (UnknownHostException e) {
+            System.out.println();
             throw new RuntimeException(e);
         } catch (IOException e) {
+            System.out.println("La connection au serveur n'a pas pu s'établir");
             throw new RuntimeException(e);
         }
     }
@@ -131,9 +136,9 @@ public class Client_fxController implements Initializable {
 
     @FXML
     public void handle(ActionEvent actionEvent) {
-        this.leCours = this.coursesDisplay.getSelectionModel().getSelectedItems();
-        System.out.println(this.leCours);
-        if(this.leCours.isEmpty()){
+        this.leCours =  this.coursesDisplay.getSelectionModel().getSelectedItems();
+        System.out.println(leCours);
+        if(this.leCours == null){
             showAlert(Alert.AlertType.ERROR, pane.getScene().getWindow(),
                     "Le formulaire est invalide" + "\n" + "Vous devez sélectionner un cours");
         }
@@ -230,11 +235,20 @@ public class Client_fxController implements Initializable {
             ObjectOutputStream objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
             ObjectInputStream objectInputStream = new ObjectInputStream(socket.getInputStream());
 
-            // Step 2: Extraire les informations du tableaix (Observable ArrayList)
-           Course coursSelectionne = new Course(coursesDisplay.getSelectionModel().getSelectedItem().getName(),
-            coursesDisplay.getSelectionModel().getSelectedItem().getCode(),
-            coursesDisplay.getSelectionModel().getSelectedItem().getSession());
-           System.out.println(coursSelectionne);
+            // Step 2: Extraire les informations du tableaux (Observable ArrayList)
+            for (Course coursTemp : this.leCours) {
+                String nomCours = coursTemp.getName();
+                String codeCours = coursTemp.getCode();
+                String sessionCours = coursTemp.getSession();
+
+                System.out.println(nomCours);
+                System.out.println(codeCours);
+                System.out.println(sessionCours);
+
+                this.coursSelectionne = new Course(nomCours,codeCours,sessionCours);
+                System.out.println(coursSelectionne);
+
+            }
 
             String prenom = String.valueOf(prenomField.getText());
             String nom = String.valueOf(nomField.getText());
@@ -244,7 +258,6 @@ public class Client_fxController implements Initializable {
             try {
                 RegistrationForm donneesInscription = new RegistrationForm(prenom, nom, email, matricule, coursSelectionne);
                 System.out.print(donneesInscription);
-                //System.out.println(donneesInscription);
                 // Step 5 : Envoyer une requete Inscription au server
                 String requeteInscription = "INSCRIRE";
                 objectOutputStream.writeObject(requeteInscription);
