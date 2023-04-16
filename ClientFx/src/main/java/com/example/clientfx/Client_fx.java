@@ -9,7 +9,6 @@ import javafx.stage.Stage;
 import java.io.IOException;
 
 public class Client_fx extends Application {
-    private static Client_fxController controleur;
     @Override
     public void start(Stage stage) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(Client_fx.class.getResource("Client_fxView.fxml"));

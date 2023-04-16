@@ -24,6 +24,7 @@ public class Client_fxController implements Initializable {
     @FXML
     private ChoiceBox choixSession;
     private String sessionVoulue;
+    @FXML
     private ArrayList<Course> coursFiltres;
     @FXML
     private TableView<Course> coursesDisplay;
