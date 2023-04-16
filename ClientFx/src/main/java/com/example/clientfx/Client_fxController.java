@@ -233,7 +233,7 @@ public class Client_fxController implements Initializable {
             ObjectInputStream objectInputStream = new ObjectInputStream(socket.getInputStream());
 
             // Step 2: Extraire les informations du tableaux (Observable ArrayList)
-            for (Course coursTemp : this.leCours) {
+             for (Course coursTemp : this.leCours) {
                 String nomCours = coursTemp.getName();
                 String codeCours = coursTemp.getCode();
                 String sessionCours = coursTemp.getSession();
