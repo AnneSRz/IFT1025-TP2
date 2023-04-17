@@ -132,7 +132,7 @@ public class Server {
 
     /**
      * Cette méthode permet d'éxécuter une action dépendemment de la commande et de l'argument en paramètre. Dans ce
-     *  cas, il y a seulement 2 types de commandes qui peuvent être traitées/ qui sont associées à une action.(Charger
+     *  cas, il y a seulement 2 types de commandes qui peuvent être traitées et qui sont associées à des action.(Charger
      *  et Inscrire). Pour l'une ou  poyr l'autre la fonction handleRegistration() sans argument ou handleLoadCourses
      *  sera éxécutée.
      *
@@ -149,7 +149,8 @@ public class Server {
 
     /**
      * HandleLoadCourses va chercher les informations qui sont disponibles sur un fichier texte. Filtre la liste de cours
-     * qu'elle est allée chercher. Ensuite cette fonction envoie la listes des cours qu'elle a filtré via le socket.
+     * qu'elle est allée chercher. Ensuite cette fonction envoie la liste des cours filtrée qu'elle pour la session
+     * choisie par le client qui lui à été envoyé via le socket.
      *
      * @param arg La session pour laquelle on veut récupérer la liste des cours qui est passée à la fonction
      * @throws FileNotFoundException si une erreur se produit lors de la lecture du fichier
@@ -199,8 +200,9 @@ public class Server {
     }
 
     /**
-     * La fonction handleRegistration récupère un object RegistrationForm. La traite et l'enregistre dans un fichier
-     * texte ensuite, elle envoie un message de confirmation au client lorsque l'inscription d'un étudiant est complétée
+     * La fonction handleRegistration récupère un object RegistrationForm qui lui a été envoyé par le client via le,
+     * socket. La traite et l'enregistre dans un fichier texte ensuite, elle envoie un message de confirmation au client
+     * lorsque l'inscription d'un étudiant est complétée
      *
      * @throws IOException
      * @throws ClassNotFoundException Si une erreur se produit lorsque les informations relatifs à l'inscription sont
