@@ -55,7 +55,7 @@ public class Client_fxController implements Initializable {
             if (sessionVoulue == null) {
                 this.sessionVoulue = (String) this.choixSession.getSelectionModel().getSelectedItem();
             } else {
-                // Procéder à charger lèinscription si elle est choisie
+                // Step 3 : Procéder à charger les cours si une session est choisie
                 this.sessionVoulue = (String) this.choixSession.getSelectionModel().getSelectedItem();
                 handleCharge();
             }
@@ -88,7 +88,7 @@ public class Client_fxController implements Initializable {
                     objectOutputStream.flush();
                     objectOutputStream.reset();
 
-                    // Step 4 : Le client recupere la liste des cours envoyes par le serveur"
+                    // Step 4 : Le client recupere la liste des cours envoyes par le serveur
                     this.coursFiltres = (ArrayList<Course>) objectInputStream.readObject();
 
                     // Step 5 : Affhiché la liste des cours dans le tableau
@@ -98,12 +98,12 @@ public class Client_fxController implements Initializable {
                     this.colonneCode.setCellValueFactory(new PropertyValueFactory<>("code"));
                     this.colonneNom.setCellValueFactory(new PropertyValueFactory<>("name"));
 
-                    // Step 5 : Fermer le socket et les fluxs d'entrées et de sortie
+                    // Step 6 : Fermer le socket et les fluxs d'entrées et de sortie
                     objectOutputStream.close();
                     objectInputStream.close();
                     socket.close();
 
-                    // Step 6 : S'occuper des execeptions rencontrés lorsque le bouton Registrer est appuyé.
+                    // Step 7 : S'occuper des execeptions rencontrés lorsque le bouton Registrer est appuyé.
                     this.registrer.setOnAction(this::handle);
 
                 } catch (ClassNotFoundException e) {
@@ -122,24 +122,26 @@ public class Client_fxController implements Initializable {
         }
     }
 
-    //Valider le Email
+    // Valider le Email qui respecte le bon format
     private static boolean emailValidation(String text1) {
         return text1.matches("^[\\w!#$%&'*+/=?`{|}~^.-]+(?:\\.[\\w!#$%&'*+/=?`{|}~^.-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$");
     }
 
-    // Step : Valider le matricule
+    // Valider le matricule que le matricule respecte le bon format
     private static boolean matriculeValidation(String text2) {
         return text2.matches("^[0-9]{8}$");
     }
 
     @FXML
     public void handle(ActionEvent actionEvent) {
+        // Step 1 : Un cours doit être sélectionné dans le tableau
         this.leCours =  this.coursesDisplay.getSelectionModel().getSelectedItems();
         System.out.println(leCours);
         if(this.leCours == null){
             showAlert(Alert.AlertType.ERROR, pane.getScene().getWindow(),
                     "Le formulaire est invalide" + "\n" + "Vous devez sélectionner un cours");
         }
+        // Step 2 : Les champs ne doivent pas êtres vide
         if (prenomField.getText().isEmpty() && nomField.getText().isEmpty() && emailField.getText().isEmpty() &
                 matriculeField.getText().isEmpty()) {
             showAlert(Alert.AlertType.ERROR, pane.getScene().getWindow(),
@@ -166,6 +168,7 @@ public class Client_fxController implements Initializable {
 
             return;
         }
+        // Step 3 : Le amail et le matricule doivent être valide
         if(!emailValidation(emailField.getText()) && matriculeValidation(matriculeField.getText())){
             emailError.setText("Email invalide");
             emailError.setStyle("-fx-text-fill: red" );
@@ -203,7 +206,8 @@ public class Client_fxController implements Initializable {
                     "Le formulaire est invalide" + "\n" +"Le champ email est invalide" + "\n" +
                             "Le champ matricule est invalide");
 
-        } else {
+        } // Si les conditions sont valide, procédés à l'inscription
+        else {
             emailError.setText("Email valide");
             emailError.setStyle("-fx-text-fill: green");
             emailField.setStyle("-fx-border-color: transparent");
@@ -227,48 +231,43 @@ public class Client_fxController implements Initializable {
     }
 
     public void handleRegistration() {
+        RegistrationForm donneesInscription = null;
         try {
             // Step 1 : Se reconnecter au serveur
             Socket socket = new Socket("127.0.0.1", 1337);
             ObjectOutputStream objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
             ObjectInputStream objectInputStream = new ObjectInputStream(socket.getInputStream());
 
-            // Step 2: Extraire les informations du tableaux (Observable ArrayList)
-            this.coursSelectionne = this.coursesDisplay.getSelectionModel().getSelectedItem();
-            this.coursSelectionne = this.coursesDisplay.getSelectionModel().getSelectedItem();
-            if(coursSelectionne instanceof Course){
-                Course coursInscrit = (Course)coursSelectionne;
-                String nomCours = coursSelectionne.getName();
-                String codeCours = coursSelectionne.getCode();
-                String sessionCours = coursSelectionne.getSession();
+            // Step 2: Extraire les informations du cours sélectionné du tableaux
+            for (Course coursTemp : this.leCours) {
+                String nomCours = coursTemp.getName();
+                String codeCours = coursTemp.getCode();
+                String sessionCours = coursTemp.getSession();
 
-                System.out.println(nomCours);
-                System.out.println(codeCours);
-                System.out.println(sessionCours);
+                this.coursSelectionne = new Course(nomCours,codeCours,sessionCours);
 
-                Course test = new Course(nomCours,codeCours,sessionCours);
-                System.out.println(test);
             }
+            // Step 3 : Obtenir les données relatifs au formulaire d'inscription entrées par l'utilisateur
 
-
-            String prenom = String.valueOf(prenomField.getText());
-            String nom = String.valueOf(nomField.getText());
-            String email = String.valueOf(emailField.getText());
-            String matricule = String.valueOf(matriculeField.getText());
+            String prenom = prenomField.getText();
+            String nom = nomField.getText();
+            String email = emailField.getText();
+            String matricule = matriculeField.getText();
 
             try {
-                RegistrationForm donneesInscription = new RegistrationForm(prenom, nom, email, matricule, coursSelectionne);
+                donneesInscription = new RegistrationForm(prenom, nom, email, matricule, coursSelectionne);
                 System.out.print(donneesInscription);
-                // Step 5 : Envoyer une requete Inscription au server
+
+                // Step 4 : Envoyer une requete Inscription au server
                 String requeteInscription = "INSCRIRE";
                 objectOutputStream.writeObject(requeteInscription);
                 objectOutputStream.flush(); // jusqu'a la ça marche la requete est envoyé
 
-                //Step 6 : Envoyer l'objet Registrationform au serveur
+                //Step 5 : Envoyer l'objet Registrationform au serveur
                 objectOutputStream.writeObject(donneesInscription);
                 objectOutputStream.flush();
 
-                // Step 7 : Lire le message de confirmation du serveur.
+                // Step 6 : Lire le message de confirmation du serveur.
                 Object msgConfirmation = objectInputStream.readObject();
                 String confirmation = (String) msgConfirmation;
                 showAlert(Alert.AlertType.ERROR, pane.getScene().getWindow(), confirmation);
@@ -277,6 +276,7 @@ public class Client_fxController implements Initializable {
                 ex.printStackTrace();
                 System.out.println("Une erreur s'est produite lors de l'envoie des données d'inscription");
             } catch (ClassNotFoundException ex) {
+                System.out.println("Une erreur s'est produite lors de l'envoie des données d'inscription");
                 throw new RuntimeException(ex);
             }
 
