@@ -50,10 +50,12 @@ public class Client_fxController implements Initializable {
         try {
             Socket socket = new Socket("127.0.0.1", 1337);
 
+            // Step 2 ; Verifier qu'une session a été choisie
             this.sessionVoulue = (String) this.choixSession.getSelectionModel().getSelectedItem();
             if (sessionVoulue == null) {
                 this.sessionVoulue = (String) this.choixSession.getSelectionModel().getSelectedItem();
             } else {
+                // Procéder à charger lèinscription si elle est choisie
                 this.sessionVoulue = (String) this.choixSession.getSelectionModel().getSelectedItem();
                 handleCharge();
             }
@@ -76,34 +78,32 @@ public class Client_fxController implements Initializable {
             // Step 2 : Aller chercher la session choisie dans la liste déroulante.
             this.sessionVoulue = (String) this.choixSession.getSelectionModel().getSelectedItem();
             if (sessionVoulue == null) {
-                showAlert(Alert.AlertType.ERROR, pane.getScene().getWindow(), "S'il vous plaît, choissisez une session");
                 this.sessionVoulue = (String) this.choixSession.getSelectionModel().getSelectedItem();
 
             } else {
                 try {
-                    // Step 2 : Envoie une requete charger au serveur "Avec la session choisie"
+                    // Step 3 : Envoie une requete charger au serveur "Avec la session choisie"
                     String requete = "CHARGER " + this.sessionVoulue;
                     objectOutputStream.writeObject(requete);
                     objectOutputStream.flush();
                     objectOutputStream.reset();
 
-                    // Step 3 : Le client recupere la liste des cours envoyes par le serveur"
+                    // Step 4 : Le client recupere la liste des cours envoyes par le serveur"
                     this.coursFiltres = (ArrayList<Course>) objectInputStream.readObject();
 
-                    // Step 4 : Affhiché la liste des cours dans le tableau
+                    // Step 5 : Affhiché la liste des cours dans le tableau
                     ObservableList<Course> listeDesCours = FXCollections.observableArrayList(this.coursFiltres);
                     this.coursesDisplay.setItems(listeDesCours);
 
                     this.colonneCode.setCellValueFactory(new PropertyValueFactory<>("code"));
                     this.colonneNom.setCellValueFactory(new PropertyValueFactory<>("name"));
 
-                    // Step 5 : Fermer le flux d'entrée et de sortie
+                    // Step 5 : Fermer le socket et les fluxs d'entrées et de sortie
                     objectOutputStream.close();
                     objectInputStream.close();
                     socket.close();
 
-                    // Step 5 : Procéder à la partie de l'inscription
-                    //handleRegistration();
+                    // Step 6 : S'occuper des execeptions rencontrés lorsque le bouton Registrer est appuyé.
                     this.registrer.setOnAction(this::handle);
 
                 } catch (ClassNotFoundException e) {
@@ -122,7 +122,7 @@ public class Client_fxController implements Initializable {
         }
     }
 
-    // Step : Valider le Email
+    //Valider le Email
     private static boolean emailValidation(String text1) {
         return text1.matches("^[\\w!#$%&'*+/=?`{|}~^.-]+(?:\\.[\\w!#$%&'*+/=?`{|}~^.-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$");
     }
@@ -234,19 +234,22 @@ public class Client_fxController implements Initializable {
             ObjectInputStream objectInputStream = new ObjectInputStream(socket.getInputStream());
 
             // Step 2: Extraire les informations du tableaux (Observable ArrayList)
-             for (Course coursTemp : this.leCours) {
-                String nomCours = coursTemp.getName();
-                String codeCours = coursTemp.getCode();
-                String sessionCours = coursTemp.getSession();
+            this.coursSelectionne = this.coursesDisplay.getSelectionModel().getSelectedItem();
+            this.coursSelectionne = this.coursesDisplay.getSelectionModel().getSelectedItem();
+            if(coursSelectionne instanceof Course){
+                Course coursInscrit = (Course)coursSelectionne;
+                String nomCours = coursSelectionne.getName();
+                String codeCours = coursSelectionne.getCode();
+                String sessionCours = coursSelectionne.getSession();
 
                 System.out.println(nomCours);
                 System.out.println(codeCours);
                 System.out.println(sessionCours);
 
-                this.coursSelectionne = new Course(nomCours,codeCours,sessionCours);
-                System.out.println(coursSelectionne);
-
+                Course test = new Course(nomCours,codeCours,sessionCours);
+                System.out.println(test);
             }
+
 
             String prenom = String.valueOf(prenomField.getText());
             String nom = String.valueOf(nomField.getText());

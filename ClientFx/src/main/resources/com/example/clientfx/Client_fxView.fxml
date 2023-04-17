@@ -14,105 +14,105 @@
 <?import javafx.scene.text.Font?>
 
 <AnchorPane fx:id="pane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="700.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.clientfx.Client_fxController">
-   <!-- Pane 1 : La où les cours filtrés seront affichés -->
-   <children>
-      <Pane prefHeight="395.0" prefWidth="345.0" style="-fx-background-color: #EEEEE4;">
-         <children>
-            <Label alignment="CENTER" contentDisplay="TOP" layoutX="87.0" layoutY="17.0" prefHeight="34.0" prefWidth="198.0" text="Liste de Cours">
-               <font>
-                  <Font size="24.0" />
-               </font>
-            </Label>
-            <TableView fx:id="coursesDisplay" layoutX="23.0" layoutY="60.0" prefHeight="320.0" prefWidth="300.0">
-               <columns>
-                  <TableColumn fx:id="colonneCode" prefWidth="150.0" text="Code">
-                     <cellValueFactory><PropertyValueFactory property="code" /></cellValueFactory>
-                  </TableColumn>
-                  <TableColumn fx:id="colonneNom" prefWidth="150.0" text="Cours">
-                     <cellValueFactory><PropertyValueFactory property="name" /></cellValueFactory>
-                  </TableColumn>
-               </columns>
-            </TableView>
-         </children></Pane>
-      <!-- Pane 2 : l'utilisateur peut choisir la session pour laquelle il peut voir les cours -->
-      <Pane layoutX="9.0" layoutY="409.0" prefHeight="84.0" prefWidth="327.0" style="-fx-background-color: #EEEEE4;">
-         <children>
-            <ChoiceBox fx:id="choixSession" layoutX="39.0" layoutY="29.0" prefHeight="27.0" prefWidth="125.0">
-               <items>
-                  <FXCollections fx:factory="observableArrayList">
-                     <String fx:value="Automne" />
-                     <String fx:value="Hiver" />
-                     <String fx:value="Ete" />
-                  </FXCollections>
-               </items>
-            </ChoiceBox>
+    <!-- Pane 1 : La où les cours filtrés seront affichés -->
+    <children>
+        <Pane prefHeight="395.0" prefWidth="345.0" style="-fx-background-color: #EEEEE4;">
+            <children>
+                <Label alignment="CENTER" contentDisplay="TOP" layoutX="87.0" layoutY="17.0" prefHeight="34.0" prefWidth="198.0" text="Liste de Cours">
+                    <font>
+                        <Font size="24.0" />
+                    </font>
+                </Label>
+                <TableView fx:id="coursesDisplay" layoutX="23.0" layoutY="60.0" prefHeight="320.0" prefWidth="300.0">
+                    <columns>
+                        <TableColumn fx:id="colonneCode" prefWidth="150.0" text="Code">
+                            <cellValueFactory><PropertyValueFactory property="code" /></cellValueFactory>
+                        </TableColumn>
+                        <TableColumn fx:id="colonneNom" prefWidth="150.0" text="Cours">
+                            <cellValueFactory><PropertyValueFactory property="name" /></cellValueFactory>
+                        </TableColumn>
+                    </columns>
+                </TableView>
+            </children></Pane>
+        <!-- Pane 2 : l'utilisateur peut choisir la session pour laquelle il peut voir les cours -->
+        <Pane layoutX="9.0" layoutY="409.0" prefHeight="84.0" prefWidth="327.0" style="-fx-background-color: #EEEEE4;">
+            <children>
+                <ChoiceBox fx:id="choixSession" layoutX="39.0" layoutY="29.0" prefHeight="27.0" prefWidth="125.0">
+                    <items>
+                        <FXCollections fx:factory="observableArrayList">
+                            <String fx:value="Automne" />
+                            <String fx:value="Hiver" />
+                            <String fx:value="Ete" />
+                        </FXCollections>
+                    </items>
+                </ChoiceBox>
 
-            <Button fx:id="chargementButton" layoutX="222.0" layoutY="29.0" mnemonicParsing="false" onAction="#handleCharge" prefHeight="26.0" prefWidth="73.0" text="charger" />
-         </children>
-      </Pane>
-      <!-- Pane 3: Dans cette section, l'utilisateur peut procedé à son inscription -->
-      <Pane layoutX="361.0" layoutY="-1.0" prefHeight="500.0" prefWidth="345.0" style="-fx-background-color: #EEEEE4;">
-         <children>
-            <Label layoutX="66.0" layoutY="19.0" prefHeight="39.0" prefWidth="241.0" text="Formulaire d'inscription">
-               <font>
-                  <Font size="24.0" />
-               </font>
-            </Label>
-            <TextField fx:id="prenomField" layoutX="155.0" layoutY="89.0" styleClass="prenomField">
-               <font>
-                  <Font size="14.0" />
-               </font>
-            </TextField>
-            <TextField fx:id="nomField" layoutX="155.0" layoutY="132.0" styleClass="nomField">
-               <font>
-                  <Font size="14.0" />
-               </font>
-            </TextField>
-            <TextField fx:id="emailField" layoutX="155.0" layoutY="170.0" styleClass="emailField">
-               <font>
-                  <Font size="14.0" />
-               </font>
-            </TextField>
-            <TextField fx:id="matriculeField" layoutX="155.0" layoutY="212.0" styleClass="matriculeField">
-               <font>
-                  <Font size="14.0" />
-               </font>
-            </TextField>
-            <Label layoutX="60.0" layoutY="95.0" text="Prenom">
-               <font>
-                  <Font size="15.0" />
-               </font>
-            </Label>
-            <Label layoutX="60.0" layoutY="135.0" text="Nom">
-               <font>
-                  <Font size="15.0" />
-               </font>
-            </Label>
-            <Label layoutX="60.0" layoutY="175.0" text="Email">
-               <font>
-                  <Font size="15.0" />
-               </font>
-            </Label>
-            <Label layoutX="60.0" layoutY="215.0" text="Matricule">
-               <font>
-                  <Font size="15.0" />
-               </font>
-            </Label>
-            <Label fx:id="emailError" layoutX="216.0" layoutY="198.0" styleClass="emailError" text="email invalide" textFill="#eeeee4">
-               <font>
-                  <Font size="10.0" />
-               </font>
-            </Label>
-            <Button fx:id="registrer" layoutX="205.0" layoutY="268.0" mnemonicParsing="false" onAction="#handle" text="envoyer">
-               <font>
-                  <Font size="15.0" />
-               </font>
-            </Button>
-            <Label fx:id="matriculeError" layoutX="211.0" layoutY="238.0" styleClass="matriculeError" text="matricule invalide" textFill="#eeeee4">
-               <font>
-                  <Font size="10.0" />
-               </font>
-            </Label>
-         </children></Pane>
-   </children>
+                <Button fx:id="chargementButton" layoutX="222.0" layoutY="29.0" mnemonicParsing="false" onAction="#handleCharge" prefHeight="26.0" prefWidth="73.0" text="charger" />
+            </children>
+        </Pane>
+        <!-- Pane 3: Dans cette section, l'utilisateur peut procedé à son inscription -->
+        <Pane layoutX="361.0" layoutY="-1.0" prefHeight="500.0" prefWidth="345.0" style="-fx-background-color: #EEEEE4;">
+            <children>
+                <Label layoutX="66.0" layoutY="19.0" prefHeight="39.0" prefWidth="241.0" text="Formulaire d'inscription">
+                    <font>
+                        <Font size="24.0" />
+                    </font>
+                </Label>
+                <TextField fx:id="prenomField" layoutX="155.0" layoutY="89.0" styleClass="prenomField">
+                    <font>
+                        <Font size="14.0" />
+                    </font>
+                </TextField>
+                <TextField fx:id="nomField" layoutX="155.0" layoutY="132.0" styleClass="nomField">
+                    <font>
+                        <Font size="14.0" />
+                    </font>
+                </TextField>
+                <TextField fx:id="emailField" layoutX="155.0" layoutY="170.0" styleClass="emailField">
+                    <font>
+                        <Font size="14.0" />
+                    </font>
+                </TextField>
+                <TextField fx:id="matriculeField" layoutX="155.0" layoutY="212.0" styleClass="matriculeField">
+                    <font>
+                        <Font size="14.0" />
+                    </font>
+                </TextField>
+                <Label layoutX="60.0" layoutY="95.0" text="Prenom">
+                    <font>
+                        <Font size="15.0" />
+                    </font>
+                </Label>
+                <Label layoutX="60.0" layoutY="135.0" text="Nom">
+                    <font>
+                        <Font size="15.0" />
+                    </font>
+                </Label>
+                <Label layoutX="60.0" layoutY="175.0" text="Email">
+                    <font>
+                        <Font size="15.0" />
+                    </font>
+                </Label>
+                <Label layoutX="60.0" layoutY="215.0" text="Matricule">
+                    <font>
+                        <Font size="15.0" />
+                    </font>
+                </Label>
+                <Label fx:id="emailError" layoutX="216.0" layoutY="198.0" styleClass="emailError" text="email invalide" textFill="#eeeee4">
+                    <font>
+                        <Font size="10.0" />
+                    </font>
+                </Label>
+                <Button fx:id="registrer" layoutX="205.0" layoutY="268.0" mnemonicParsing="false" onAction="#handle" text="envoyer">
+                    <font>
+                        <Font size="15.0" />
+                    </font>
+                </Button>
+                <Label fx:id="matriculeError" layoutX="211.0" layoutY="238.0" styleClass="matriculeError" text="matricule invalide" textFill="#eeeee4">
+                    <font>
+                        <Font size="10.0" />
+                    </font>
+                </Label>
+            </children></Pane>
+    </children>
 </AnchorPane>
