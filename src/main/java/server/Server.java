@@ -87,8 +87,8 @@ public class Server {
 
     /**
      * La méthode listen() écoute les informations et lit les lignes de texte qui lui sont transmises par le client via le
-     * socket. Après avoir obtenu la commande et l'argument avec proccesCommandeLine();, elle appelle la méthode
-     * alertHandlers en lui passant la commande et l'argument.
+     * socket. Après avoir obtenu la commande et l'argument;, elle appelle la méthode alertHandlers en lui passant la
+     * commande et l'argument.
      *
      * @throws IOException pour les erreurs qui se prosuident lors de la lecture ou de l'écoute
      * @throws ClassNotFoundException lance une exception si la classe de l'object reçcu (par exmple Course) n'existe

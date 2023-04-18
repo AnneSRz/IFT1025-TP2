@@ -42,12 +42,16 @@ public class Client_fxController implements Initializable {
     private Button registrer;
     @FXML
     private ObservableList<Course> leCours;
-    private Course coursSelectionne;
     //</editor-fold>
 
     /**
-     * @param url
-     * @param resourceBundle
+     * Cette méthode initialise le controleur, se connecte au serveur et verifie si une session a été choisie dans la
+     * liste déroulante. Si une session est choisie,il fait appel à la fonction handle Charge
+     *
+     * @param url le paramètre url permet d'organiser le contenu et de trouver les informations dans le fichiers FXML
+     * @param resourceBundle Pour les objects locaux, si le programme a besoin d'une ressource, ressouceBundle peut le
+     * charger
+     * @throws IOException Lance une exception si une erreur se produit lors de la connection au serveur
      */
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -74,8 +78,14 @@ public class Client_fxController implements Initializable {
     }
 
     /**
-     * @throws ClassNotFoundException
-     * @throws IOException
+     * Cette méthode envoie une requête Charger avec une session choisie par le client au serveur, va chercher la liste
+     * des cours qui lui ont été envoyés et l'affiche dans un tableau. Elle permet aussi a l'utilisateur de choisir
+     * plusiueurs fois une session différente pour voir les cours disponibles
+     *
+     * @throws ClassNotFoundException Au cas où l'object Course de la liste des cours envoyés par le serveur
+     * n'a pas pu être lu.
+     * @throws IOException Lance une exception si une erreur se produit lors de la connexion entre le serveur et le
+     * client
      */
     @FXML
     public void handleCharge() {
@@ -135,8 +145,11 @@ public class Client_fxController implements Initializable {
     }
 
     /**
-     * @param text1
-     * @return
+     * Cette méthode permet de valider si le format de l'email que l'utilisateur a entrée dans la boîte de texte est
+     * conforme.
+     *
+     * @param text1 Prend en paramètre le texte que l'utilisateur a entré qui correspond à l'email qui doit être validé.
+     * @return true - l'adresse email est valide. Sinon false
      */
     // Valider le Email qui respecte le bon format
     private static boolean emailValidation(String text1) {
@@ -144,8 +157,8 @@ public class Client_fxController implements Initializable {
     }
 
     /**
-     * @param text2
-     * @return
+     * @param text2 Prend en paramètre le texte que l'utilisateur a entré qui correspond au matricule qui doit être validé.
+     * @return true -  l'adresse email est valide. Sinon false
      */
     // Valider le matricule que le matricule respecte le bon format
     private static boolean matriculeValidation(String text2) {
@@ -153,7 +166,12 @@ public class Client_fxController implements Initializable {
     }
 
     /**
-     * @param actionEvent
+     * Cette méthode permet de vérifier s'il y a des erreurs dans le formulaire d'inscription lorsque l'utilisateur
+     * appuie sur le bouton envoyé. De ce fait, toutes les conditions doivent être remplies pour pouvoir envoyer une
+     * demande d'inscription (les champs ne doivent pas être vides, l'email et le matricule doivent être valide et un
+     * un cours doit être sélectionné)
+     *
+     * @param actionEvent l'évènement du clic de la souris sur le bouton envoyé
      */
     @FXML
     public void handle(ActionEvent actionEvent) {
@@ -245,9 +263,12 @@ public class Client_fxController implements Initializable {
     }
 
     /**
-     * @param error
-     * @param window
-     * @param Message
+     * Cette méthode affiche une boîte de dialogue relatifs aux erreurs dans le formulaire d'inscription lorsque
+     * l'utlisateur appuie sur le bouton envoyé
+     *
+     * @param error le type d'erreur (Alerte ou confirmation)
+     * @param window la fenêtre pour l'alerte
+     * @param Message le message qui va être affiché dans la boîte de dialogue
      */
     private void showAlert(Alert.AlertType error, Window window, String Message) {
         Alert messageAlert = new Alert(error);
@@ -258,10 +279,15 @@ public class Client_fxController implements Initializable {
         messageAlert.show();
     }
 
+
     /**
-     * @throws IOException
-     * @throws UnknownHostException
-     * @throws RuntimeException
+     * Cette méthode se connecte au serveur et lui envoie une requête Inscrire avec les donnnées du formulaire
+     * d'inscription.
+     *
+     * @throws IOException Lance une exception si une erreur se produit lors de l'envoie de la reqête et des données
+     * d'inscription.
+     * @throws UnknownHostException Lance une exception si une erreur se produit lors de la connexion entre le serveur
+     * et le client
      */
     public void handleRegistration() {
         RegistrationForm donneesInscription = null;
@@ -298,7 +324,7 @@ public class Client_fxController implements Initializable {
                 // Step 6 : Lire le message de confirmation du serveur.
                 Object msgConfirmation = objectInputStream.readObject();
                 String confirmation = (String) msgConfirmation;
-                showAlert(Alert.AlertType.ERROR, pane.getScene().getWindow(), confirmation);
+                showAlert(Alert.AlertType.CONFIRMATION, pane.getScene().getWindow(), confirmation);
                 System.out.println(confirmation);
             } catch (IOException ex) {
                 ex.printStackTrace();

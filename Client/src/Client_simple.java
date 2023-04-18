@@ -6,6 +6,10 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+/**
+ * Le client va envoyer des reqêtes au serveur pour permettre a un utilisateur de visionner des cours pour une session
+ * donnée et de s'inscrire au cours de son choix.
+ */
 public class Client_simple {
     private int port;
     private ArrayList<Course> coursFiltres;
@@ -13,6 +17,15 @@ public class Client_simple {
         this.port = port;
     }
 
+    /**
+     * Cette méthode envoie une requête Charger avec une session choisie par le client au serveur, va chercher la liste
+     * des cours qui lui ont été envoyés et l'affiche.
+     *
+     * @throws ClassNotFoundException Au cas où l'object Course de la liste des cours envoyés par le serveur
+     *  n'a pas pu être lu.
+     * @throws IOException Lance une exception si une erreur se produit lors de la connexion entre le serveur et le
+     *  client
+     */
     public void charger() {
         try {
             //Step 1 : Connecter le client au serveur
@@ -82,6 +95,18 @@ public class Client_simple {
         }
     }
 
+    /**
+     * Cette méthode se connecte au serveur et lui envoie une requête Inscrire avec les donnnées du formulaire
+     * d'inscription. Elle permet aussi a l'utilisateur de renvoyés une autre requête charger s'il veut voir les cours
+     * pour une autre session. De plus, elle s'assure que le cours dans lequel l'utilisateur veut s'inscrire est
+     * disponible dans la session qui à été choisie. Pour finir inscription() affiche le message de confirmation
+     * envoyés par le serveur lorsque l'inscription est complétée.
+     *
+     * @throws IOException Lance une exception si une erreur se produit lors de l'envoie de la reqête et des données
+     * d'inscription.
+     * @throws IOException Lance une autre exception si une erreur se produit lors de la connexion entre le serveur
+     * et le client
+     */
     public void inscription() {
 
         int optionVoulue = 0;
