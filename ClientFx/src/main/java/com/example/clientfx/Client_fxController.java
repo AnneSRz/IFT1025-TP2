@@ -16,7 +16,9 @@ import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
-
+/**
+ *
+ */
 public class Client_fxController implements Initializable {
     //<editor-fold desc="Attributs">
     @FXML
@@ -43,6 +45,10 @@ public class Client_fxController implements Initializable {
     private Course coursSelectionne;
     //</editor-fold>
 
+    /**
+     * @param url
+     * @param resourceBundle
+     */
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
 
@@ -67,6 +73,10 @@ public class Client_fxController implements Initializable {
         }
     }
 
+    /**
+     * @throws ClassNotFoundException
+     * @throws IOException
+     */
     @FXML
     public void handleCharge() {
         try {
@@ -91,7 +101,7 @@ public class Client_fxController implements Initializable {
                     // Step 4 : Le client recupere la liste des cours envoyes par le serveur
                     this.coursFiltres = (ArrayList<Course>) objectInputStream.readObject();
 
-                    // Step 5 : Affhiché la liste des cours dans le tableau
+                    // Step 5 : Affiché la liste des cours dans le tableau
                     ObservableList<Course> listeDesCours = FXCollections.observableArrayList(this.coursFiltres);
                     this.coursesDisplay.setItems(listeDesCours);
 
@@ -122,16 +132,27 @@ public class Client_fxController implements Initializable {
         }
     }
 
+    /**
+     * @param text1
+     * @return
+     */
     // Valider le Email qui respecte le bon format
     private static boolean emailValidation(String text1) {
         return text1.matches("^[\\w!#$%&'*+/=?`{|}~^.-]+(?:\\.[\\w!#$%&'*+/=?`{|}~^.-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$");
     }
 
+    /**
+     * @param text2
+     * @return
+     */
     // Valider le matricule que le matricule respecte le bon format
     private static boolean matriculeValidation(String text2) {
         return text2.matches("^[0-9]{8}$");
     }
 
+    /**
+     * @param actionEvent
+     */
     @FXML
     public void handle(ActionEvent actionEvent) {
         // Step 1 : Un cours doit être sélectionné dans le tableau
@@ -221,6 +242,11 @@ public class Client_fxController implements Initializable {
         }
     }
 
+    /**
+     * @param error
+     * @param window
+     * @param Message
+     */
     private void showAlert(Alert.AlertType error, Window window, String Message) {
         Alert messageAlert = new Alert(error);
         String messageErreur = "Message";
@@ -230,6 +256,11 @@ public class Client_fxController implements Initializable {
         messageAlert.show();
     }
 
+    /**
+     * @throws IOException
+     * @throws UnknownHostException
+     * @throws RuntimeException
+     */
     public void handleRegistration() {
         RegistrationForm donneesInscription = null;
         try {
