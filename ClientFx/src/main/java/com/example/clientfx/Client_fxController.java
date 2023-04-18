@@ -29,7 +29,7 @@ public class Client_fxController implements Initializable {
     @FXML
     private ArrayList<Course> coursFiltres;
     @FXML
-    private TableView<Course> coursesDisplay;
+    private TableView<Course> coursesTable;
     @FXML
     private TableColumn<Course, String> colonneCode;
     @FXML
@@ -102,13 +102,15 @@ public class Client_fxController implements Initializable {
                     this.coursFiltres = (ArrayList<Course>) objectInputStream.readObject();
 
                     // Step 5 : Affiché la liste des cours dans le tableau
-                    ObservableList<Course> listeDesCours = FXCollections.observableArrayList(this.coursFiltres);
-                    this.coursesDisplay.setItems(listeDesCours);
+                    coursesTable.getItems().clear();
 
+                    ObservableList<Course> listeDesCours = FXCollections.observableList(this.coursFiltres);
+                    this.coursesTable.setItems(listeDesCours);
                     this.colonneCode.setCellValueFactory(new PropertyValueFactory<>("code"));
                     this.colonneNom.setCellValueFactory(new PropertyValueFactory<>("name"));
 
                     // Step 6 : Fermer le socket et les fluxs d'entrées et de sortie
+
                     objectOutputStream.close();
                     objectInputStream.close();
                     socket.close();
@@ -156,7 +158,7 @@ public class Client_fxController implements Initializable {
     @FXML
     public void handle(ActionEvent actionEvent) {
         // Step 1 : Un cours doit être sélectionné dans le tableau
-        this.leCours =  this.coursesDisplay.getSelectionModel().getSelectedItems();
+        this.leCours =  this.coursesTable.getSelectionModel().getSelectedItems();
         System.out.println(leCours);
         if(this.leCours == null){
             showAlert(Alert.AlertType.ERROR, pane.getScene().getWindow(),
@@ -269,21 +271,16 @@ public class Client_fxController implements Initializable {
             ObjectOutputStream objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
             ObjectInputStream objectInputStream = new ObjectInputStream(socket.getInputStream());
 
-            // Step 2: Extraire les informations du cours sélectionné du tableaux
-            for (Course coursTemp : this.leCours) {
-                String nomCours = coursTemp.getName();
-                String codeCours = coursTemp.getCode();
-                String sessionCours = coursTemp.getSession();
-
-                this.coursSelectionne = new Course(nomCours,codeCours,sessionCours);
-
-            }
-            // Step 3 : Obtenir les données relatifs au formulaire d'inscription entrées par l'utilisateur
+            // Step 2 : Obtenir les données relatifs au formulaire d'inscription entrées par l'utilisateur
 
             String prenom = prenomField.getText();
             String nom = nomField.getText();
             String email = emailField.getText();
             String matricule = matriculeField.getText();
+
+
+            // Step 3 : Extraire les informations du cours sélectionné du tableaux
+            Course coursSelectionne = coursesTable.getSelectionModel().getSelectedItem();
 
             try {
                 donneesInscription = new RegistrationForm(prenom, nom, email, matricule, coursSelectionne);
@@ -312,6 +309,7 @@ public class Client_fxController implements Initializable {
             }
 
         } catch (UnknownHostException ex) {
+            System.out.println("Une erreur s'est produite lors de la connexion au serveur");
             throw new RuntimeException(ex);
         } catch (IOException e) {
             throw new RuntimeException(e);
