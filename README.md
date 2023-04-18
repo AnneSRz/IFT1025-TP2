@@ -2,7 +2,9 @@
 
 Anne Sophie Rozéfort - 20189221
 
-lien Vidéo : 
+lien Vidéo(Sharepoint) : https://udemontreal-my.sharepoint.com/:v:/r/personal/anne_sophie_rozefort_umontreal_ca/Documents/Rozefort-TFT1025-TP2-Video.mp4?csf=1&web=1&e=rY8Jav
+
+lien Video(DropBox) : https://www.dropbox.com/s/foq1jet4jbv093q/Rozefort-TFT1025-TP2-Video.mp4?dl=0
 
 Path des jars :
 Server - /out/artifacts/"server.jar"
